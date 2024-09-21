@@ -5,6 +5,12 @@
         }
 }
 
+# Internal Access Check
+{$ACCESS_CHECK_SUBDOMAIN}.{$EXTERNAL_DOMAIN} {
+        respond "Success!"
+        import cloudflare
+}
+
 # Home Assistant
 {$HOME_ASSISTANT_SUBDOMAIN}.{$EXTERNAL_DOMAIN} {
         reverse_proxy {$PROXY_HOST_URL}:{$HOME_ASSISTANT_PORT}
