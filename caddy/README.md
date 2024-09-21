@@ -15,3 +15,9 @@ docker-compose up -d
 ```sh
 docker-compose down
 ```
+
+## Reload Caddyfile
+
+```sh
+docker exec -w /etc/caddy caddy-caddy-1 caddy reload
+```
