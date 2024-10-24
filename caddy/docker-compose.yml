@@ -11,6 +11,7 @@ services:
       - "443:443/udp"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./html:/etc/caddy/html
       - caddy_data:/data
       - caddy_config:/config
     environment:
@@ -18,6 +19,7 @@ services:
       EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
       PROXY_HOST_URL: ${PROXY_HOST_URL:?error}
       ACCESS_CHECK_SUBDOMAIN: ${ACCESS_CHECK_SUBDOMAIN:?error}
+      SERVICES_DASHBOARD_SUBDOMAIN: ${SERVICES_DASHBOARD_SUBDOMAIN:?error}
       HOME_ASSISTANT_SUBDOMAIN: ${HOME_ASSISTANT_SUBDOMAIN:?error}
       HOME_ASSISTANT_PORT: ${HOME_ASSISTANT_PORT:?error}
       SPOTIFY_DASH_FRONT_SUBDOMAIN: ${SPOTIFY_DASH_FRONT_SUBDOMAIN:?error}
