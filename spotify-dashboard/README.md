@@ -7,11 +7,18 @@ Source codebase and instructions: https://github.com/Yooooomi/your_spotify
 ### Start services
 
 ```sh
-docker-compose up -d
+sudo docker compose up -d
 ```
 
 ### Stop services
 
 ```sh
-docker-compose down
+sudo docker compose down
+```
+
+### Update services
+
+```sh
+sudo docker compose pull
+sudo docker compose up -d
 ```

@@ -7,18 +7,18 @@ Home Assistant is an open-source home automation platform. I use it to manage my
 ### Start services
 
 ```sh
-docker-compose up -d
+sudo docker compose up -d
 ```
 
 ### Stop services
 
 ```sh
-docker-compose down
+sudo docker compose down
 ```
 
 ### Update services
 
 ```sh
-docker-compose pull
-docker-compose up -d
+sudo docker compose pull
+sudo docker compose up -d
 ```

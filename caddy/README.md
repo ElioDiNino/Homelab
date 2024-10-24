@@ -7,17 +7,24 @@ I use Caddy as a reverse proxy for my services. I use a custom build that includ
 ### Start services
 
 ```sh
-docker-compose up -d
+sudo docker compose up -d
 ```
 
 ### Stop services
 
 ```sh
-docker-compose down
+sudo docker compose down
 ```
 
-## Reload Caddyfile
+### Reload Caddyfile
 
 ```sh
-docker exec -w /etc/caddy caddy-caddy-1 caddy reload
+sudo docker exec -w /etc/caddy caddy-caddy-1 caddy reload
+```
+
+### Update services
+
+```sh
+sudo docker compose build
+sudo docker compose up -d
 ```

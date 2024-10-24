@@ -1,0 +1,27 @@
+body {
+  font-family: sans-serif;
+  background-color: #121212;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  overflow: hidden;
+}
+h1 {
+  text-align: center;
+}
+ul {
+  padding: 0 0 0 20px;
+}
+li {
+  margin: 10px 0;
+}
+a {
+  color: #1e90ff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
