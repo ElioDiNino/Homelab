@@ -61,6 +61,12 @@
                                 </li>
                                 <li>
                                   <a
+                                    href="https://{$PDF_TOOLS_SUBDOMAIN}.{$EXTERNAL_DOMAIN}"
+                                    target="_blank"
+                                    >PDF Tools</a
+                                  >
+                                <li>
+                                  <a
                                     href="https://{$SPOTIFY_DASH_FRONT_SUBDOMAIN}.{$EXTERNAL_DOMAIN}"
                                     target="_blank"
                                     >Spotify Dashboard</a
@@ -90,6 +96,12 @@
 # Home Assistant
 {$HOME_ASSISTANT_SUBDOMAIN}.{$EXTERNAL_DOMAIN} {
 	reverse_proxy {$PROXY_HOST_URL}:{$HOME_ASSISTANT_PORT}
+	import cloudflare
+}
+
+# PDF Tools
+{$PDF_TOOLS_SUBDOMAIN}.{$EXTERNAL_DOMAIN} {
+	reverse_proxy {$PROXY_HOST_URL}:{$PDF_TOOLS_PORT}
 	import cloudflare
 }
 
