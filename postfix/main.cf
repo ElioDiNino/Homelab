@@ -1,0 +1,33 @@
+# See /usr/share/postfix/main.cf.dist for a commented, more complete version
+
+myhostname=pve.internal.eliodinino.com
+
+smtpd_banner = $myhostname ESMTP $mail_name (Debian/GNU)
+biff = no
+
+# appending .domain is the MUA's job.
+append_dot_mydomain = no
+
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+
+relayhost = [smtp.forwardemail.net]:465
+smtp_sasl_auth_enable = yes
+smtp_sasl_security_options = noanonymous
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_tls_wrappermode = yes
+smtp_tls_security_level = secure
+smtp_tls_mandatory_ciphers = high
+smtp_tls_mandatory_protocols = >=TLSv1.2
+smtp_tls_secure_cert_match = nexthop, dot-nexthop
+smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+
+smtp_header_checks = regexp:/etc/postfix/smtp_header_checks
+sender_canonical_maps =  regexp:/etc/postfix/sender_canonical_maps
+
+mynetworks = 127.0.0.0/8
+inet_protocols = ipv4
+inet_interfaces = loopback-only
+recipient_delimiter = +
+
+compatibility_level = 2
