@@ -1,0 +1,9 @@
+[monuser]
+    password = {NUT_PASSWORD}
+    upsmon primary
+
+[nut-admin]
+    password = {NUT_PASSWORD}
+    actions = SET
+    instcmds = ALL
+    upsmon primary
