@@ -1,0 +1,1 @@
+[smtp.forwardemail.net]:465 {SENDER_EMAIL}:{SMTP_PASSWORD}
