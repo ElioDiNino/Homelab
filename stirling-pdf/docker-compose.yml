@@ -17,7 +17,8 @@ services:
       LEGAL_TERMSANDCONDITIONS: ''
       LEGAL_PRIVACYPOLICY: ''
       SYSTEM_SHOWUPDATE: true
-      SYSTEM_ENABLEANALYTICS: true
+      SYSTEM_ENABLEANALYTICS: false
+      SYSTEM_FILEUPLOADLIMIT: 150MB
       UI_APPNAME: PDF Tools
       UI_HOMEDESCRIPTION: A locally hosted one-stop-shop for all your PDF needs.
       UI_APPNAMENAVBAR: PDF Tools
