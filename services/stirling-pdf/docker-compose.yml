@@ -1,0 +1,65 @@
+services:
+  # Workaround for volume mount subpaths not existing (see https://github.com/moby/moby/issues/47842)
+  volume_instantiation:
+    image: "alpine:latest"
+    command: |
+      mkdir -p /srv/stirling-pdf/configs /srv/stirling-pdf/logs /srv/stirling-pdf/customFiles /srv/stirling-pdf/pipeline /srv/stirling-pdf/trainingData
+    volumes:
+      - data:/srv/stirling-pdf
+
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
+    restart: unless-stopped
+    depends_on:
+      - volume_instantiation
+    volumes:
+      - type: volume
+        source: data
+        target: /configs
+        volume:
+          subpath: configs
+      - type: volume
+        source: data
+        target: /logs
+        volume:
+          subpath: logs
+      - type: volume
+        source: data
+        target: /customFiles
+        volume:
+          subpath: customFiles
+      - type: volume
+        source: data
+        target: /pipeline
+        volume:
+          subpath: pipeline
+      - type: volume
+        source: data
+        target: /usr/share/tessdata
+        volume:
+          subpath: trainingData
+    environment:
+      # Ref: https://docs.stirlingpdf.com/Advanced%20Configuration/How%20to%20add%20configurations
+      INSTALL_BOOK_AND_ADVANCED_HTML_OPS: true
+      LANGS: enUS,en_GB
+      SECURITY_CSRFDISABLED: false
+      LEGAL_TERMSANDCONDITIONS: ''
+      LEGAL_PRIVACYPOLICY: ''
+      SYSTEM_SHOWUPDATE: true
+      SYSTEM_ENABLEANALYTICS: false
+      SYSTEM_FILEUPLOADLIMIT: 150MB
+      UI_APPNAME: PDF Tools
+      UI_HOMEDESCRIPTION: A locally hosted one-stop shop for all your PDF needs.
+      UI_APPNAMENAVBAR: PDF Tools
+    networks:
+      - proxy-internal
+    labels:
+      caddy: "pdf.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 8080 }}"
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true
