@@ -1,0 +1,78 @@
+services:
+  caddy:
+    image: caddy:custom
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+      - config:/config
+    ports:
+      - 80:80
+      - 443:443
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - proxy-internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      CADDY_INGRESS_NETWORKS: proxy-internal
+      EMAIL: ${EMAIL:?error}
+      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?error}
+      INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+      DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
+      PROXMOX_HOST: ${PROXMOX_HOST:?error}
+
+  caddy-config:
+    image: traefik/whoami:latest
+    restart: unless-stopped
+    networks:
+      - proxy-internal
+    labels:
+      #### Global Settings ####
+      caddy_0.email: "{env.EMAIL}"
+      caddy_0.auto_https: prefer_wildcard
+
+      # When debugging, use staging server
+      # caddy_0.acme_ca: https://acme-staging-v02.api.letsencrypt.org/directory
+
+      #### Snippets ####
+
+      # Get wildcard certificate
+      caddy_1: (wildcard)
+      caddy_1.tls.dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
+      caddy_1.tls.resolvers: 1.1.1.1 1.0.0.1
+
+      # Skip TLS verify for backend with self-signed HTTPS
+      caddy_2: (https)
+      caddy_2.transport: http
+      caddy_2.transport.tls: ""
+      caddy_2.transport.tls_insecure_skip_verify: ""
+
+      #### Wildcard Definitions ####
+      caddy_10: "*.{$$INTERNAL_DOMAIN}"
+      caddy_10.import: wildcard
+
+      #### Static Definitions ####
+
+      # This debugging container
+      # https://github.com/traefik/whoami
+      caddy_99: whoami.{$$INTERNAL_DOMAIN}
+      caddy_99.reverse_proxy: "{{ upstreams 80 }}"
+
+      # Internal access check
+      caddy_100: "ping.{$$INTERNAL_DOMAIN}"
+      caddy_100.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
+
+      # Proxmox
+      caddy_101: "pve.{$$INTERNAL_DOMAIN}"
+      caddy_101.reverse_proxy: "{$$PROXMOX_HOST}:8006"
+      caddy_101.reverse_proxy.import: https
+
+networks:
+  proxy-internal:
+    external: true
+
+volumes:
+  data:
+  config:
