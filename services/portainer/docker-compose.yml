@@ -1,0 +1,28 @@
+name: portainer
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ee:latest
+    command: -H unix:///var/run/docker.sock
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+    ports:
+      - 9443:9443
+    networks:
+      - proxy-internal
+    labels:
+      caddy: "portainer.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 9443 }}"
+      caddy.reverse_proxy.import: https
+
+networks:
+  proxy-internal:
+    external: true
+
+volumes:
+  data:
+    name: portainer_data
+    external: true
