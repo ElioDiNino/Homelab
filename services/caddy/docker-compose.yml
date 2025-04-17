@@ -1,6 +1,7 @@
 services:
   caddy:
     image: caddy:custom
+    build: .
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
