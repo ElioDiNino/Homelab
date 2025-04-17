@@ -1,0 +1,49 @@
+services:
+  server:
+    image: yooooomi/your_spotify_server
+    restart: unless-stopped
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    environment:
+      API_ENDPOINT: "https://sdb.${INTERNAL_DOMAIN:?error}"
+      CLIENT_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}"
+      CORS: "https://sd.${INTERNAL_DOMAIN:?error}"
+      SPOTIFY_PUBLIC: ${SPOTIFY_PUBLIC:?error}
+      SPOTIFY_SECRET: ${SPOTIFY_SECRET:?error}
+      TIMEZONE: ${TIMEZONE:?error}
+    networks:
+      - proxy-internal
+      - default
+    labels:
+      caddy: "sdb.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 8080 }}"
+
+  mongo:
+    # Using an older version due to hardware compatibility
+    image: mongo:4.4.18
+    restart: unless-stopped
+    volumes:
+      - data:/data/db
+    networks:
+      - default
+
+  web:
+    image: yooooomi/your_spotify_client
+    restart: unless-stopped
+    environment:
+      API_ENDPOINT: "https://sdb.${INTERNAL_DOMAIN:?error}"
+    networks:
+      - proxy-internal
+    labels:
+      caddy: "sd.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 3000 }}"
+
+volumes:
+  data:
+
+networks:
+  default:
+  proxy-internal:
+    external: true
