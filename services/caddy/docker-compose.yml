@@ -23,6 +23,7 @@ services:
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
+      HEXOS_HOST: ${HEXOS_HOST:?error}
 
   caddy-config:
     image: traefik/whoami:latest
@@ -69,6 +70,10 @@ services:
       caddy_101: "pve.{$$INTERNAL_DOMAIN}"
       caddy_101.reverse_proxy: "{$$PROXMOX_HOST}:8006"
       caddy_101.reverse_proxy.import: https
+
+      # TrueNAS
+      caddy_102: "truenas.{$$INTERNAL_DOMAIN}"
+      caddy_102.reverse_proxy: "{$$HEXOS_HOST}"
 
 networks:
   proxy-internal:
