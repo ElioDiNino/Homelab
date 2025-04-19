@@ -24,6 +24,7 @@ services:
       DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
       HEXOS_HOST: ${HEXOS_HOST:?error}
+      HAOS_HOST: ${HAOS_HOST:?error}
 
   caddy-config:
     image: traefik/whoami:latest
@@ -73,7 +74,11 @@ services:
 
       # TrueNAS
       caddy_102: "truenas.{$$INTERNAL_DOMAIN}"
-      caddy_102.reverse_proxy: "{$$HEXOS_HOST}"
+      caddy_102.reverse_proxy: "{$$HEXOS_HOST}:80"
+
+      # Home Assistant OS
+      caddy_103: "ha.{$$INTERNAL_DOMAIN}"
+      caddy_103.reverse_proxy: "{$$HAOS_HOST}:8123"
 
 networks:
   proxy-internal:
