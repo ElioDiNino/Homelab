@@ -7,18 +7,21 @@ services:
     depends_on:
       - mongo
     environment:
-      API_ENDPOINT: "https://sdb.${INTERNAL_DOMAIN:?error}"
+      API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
       CLIENT_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}"
       CORS: "https://sd.${INTERNAL_DOMAIN:?error}"
       SPOTIFY_PUBLIC: ${SPOTIFY_PUBLIC:?error}
       SPOTIFY_SECRET: ${SPOTIFY_SECRET:?error}
       TIMEZONE: ${TIMEZONE:?error}
+      PROMETHEUS_USERNAME: ${PROMETHEUS_USERNAME:?error}
+      PROMETHEUS_PASSWORD: ${PROMETHEUS_PASSWORD:?error}
     networks:
       - proxy-internal
       - default
     labels:
-      caddy: "sdb.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 8080 }}"
+      caddy: "sd.{$$INTERNAL_DOMAIN}"
+      caddy.handle_path: "/api/*"
+      caddy.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
 
   mongo:
     # Using an older version due to hardware compatibility
@@ -33,12 +36,12 @@ services:
     image: yooooomi/your_spotify_client
     restart: unless-stopped
     environment:
-      API_ENDPOINT: "https://sdb.${INTERNAL_DOMAIN:?error}"
+      API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
     networks:
       - proxy-internal
     labels:
       caddy: "sd.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 3000 }}"
+      caddy.reverse_proxy: "* {{ upstreams 3000 }}"
 
 volumes:
   data:
