@@ -10,6 +10,7 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 443:443/udp
     cap_add:
       - NET_ADMIN
     networks:
@@ -34,9 +35,12 @@ services:
     labels:
       #### Global Settings ####
       caddy_0.email: "{env.EMAIL}"
-      caddy_0.auto_https: prefer_wildcard
+      caddy_0.acme_dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
+      caddy_0.dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
+      caddy_0.ech: "ech.{$$INTERNAL_DOMAIN}"
 
-      # When debugging, use staging server
+      # When debugging, use debug flag and staging server
+      # caddy_0.debug: ""
       # caddy_0.acme_ca: https://acme-staging-v02.api.letsencrypt.org/directory
 
       #### Snippets ####
@@ -65,6 +69,7 @@ services:
 
       # Internal access check
       caddy_100: "ping.{$$INTERNAL_DOMAIN}"
+      caddy_100.header.Access-Control-Allow-Origin: "*"
       caddy_100.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
 
       # Proxmox
