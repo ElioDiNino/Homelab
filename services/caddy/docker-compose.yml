@@ -65,6 +65,7 @@ services:
 
       # Internal access check
       caddy_100: "ping.{$$INTERNAL_DOMAIN}"
+      caddy_100.header.Access-Control-Allow-Origin: "*"
       caddy_100.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
 
       # Proxmox
