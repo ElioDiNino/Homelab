@@ -52,6 +52,7 @@ services:
       UI_HOMEDESCRIPTION: A locally hosted one-stop shop for all your PDF needs.
       UI_APPNAMENAVBAR: PDF Tools
       SHOW_SURVEY: false
+      DISABLE_PIXEL: true
     networks:
       - proxy-internal
     labels:
