@@ -7,8 +7,6 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "Dependencies"
     groups:
       dependencies:
         patterns:
@@ -19,13 +17,15 @@ updates:
       - "/services/*"
     schedule:
       interval: "weekly"
-    labels:
-      - "Dependencies"
+    ignore:
+      - dependency-name: "mongo"
+        versions: ["~> 4.4"]
 
   - package-ecosystem: "docker-compose"
     directories:
       - "/services/*"
     schedule:
       interval: "weekly"
-    labels:
-      - "Dependencies"
+    ignore:
+      - dependency-name: "mongo"
+        versions: ["~> 4.4"]
