@@ -1,0 +1,135 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/**/Dockerfile"
+      - ".github/workflows/build-images.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "services/**/Dockerfile"
+      - ".github/workflows/build-images.yml"
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Service to build (optional, builds all if not specified)"
+        required: false
+        default: ""
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  output-services:
+    name: Output Services to Build
+    runs-on: ubuntu-latest
+    outputs:
+      services: ${{ steps.find.outputs.services }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Define services to build
+        id: find
+        run: |
+          services=()
+
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.service }}" ]; then
+            service_name="${{ github.event.inputs.service }}"
+            if [ -f "services/${service_name}/Dockerfile" ]; then
+              services+=("$service_name")
+              echo "Building specified service: $service_name"
+            else
+              echo "Error: Service '$service_name' does not exist or does not have a Dockerfile"
+              exit 1
+            fi
+          else
+            echo "No specific service input provided, searching for all services with Dockerfiles."
+            for service_dir in services/*/; do
+              if [ -f "${service_dir}Dockerfile" ]; then
+                service_name=$(basename "$service_dir")
+                services+=("$service_name")
+              fi
+            done
+          fi
+
+          # Convert to JSON array
+          if [ ${#services[@]} -eq 0 ]; then
+            json_array="[]"
+            echo "No services found to build"
+          else
+            printf -v joined '%s,' "${services[@]}"
+            json_array="[\"${joined%,}\"]"
+            echo "Found services to build: ${json_array}"
+          fi
+          echo "services=${json_array}" >> "$GITHUB_OUTPUT"
+
+  build-and-push:
+    needs: output-services
+    name: Build and Publish Image
+    if: ${{ needs.output-services.outputs.services != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.output-services.outputs.services) }}
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+
+      - name: Log in to Container Registry
+        id: login
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v5.7.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,enable={{is_default_branch}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: ./services/${{ matrix.service }}
+          file: ./services/${{ matrix.service }}/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: ${{ steps.login.outcome == 'success' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Generate artifact attestation
+        if: ${{ steps.login.outcome == 'success' }}
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
+          subject-digest: ${{ steps.build.outputs.digest }}
+          push-to-registry: true
