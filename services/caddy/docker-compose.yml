@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: caddy:custom
+    image: ghcr.io/eliodinino/homelab/caddy:latest
     build: .
     restart: unless-stopped
     volumes:
