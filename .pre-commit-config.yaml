@@ -29,7 +29,7 @@ repos:
       - id: requirements-txt-fixer
       - id: trailing-whitespace
   - repo: https://github.com/google/yamlfmt
-    rev: v0.16.0
+    rev: v0.17.2
     hooks:
       - id: yamlfmt
   - repo: https://github.com/openstack/bashate
@@ -37,10 +37,13 @@ repos:
     hooks:
       - id: bashate
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.24.3
+    rev: v8.27.2
     hooks:
       - id: gitleaks
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.7
     hooks:
       - id: actionlint
+        additional_dependencies:
+          # Ref: https://github.com/rhysd/actionlint/issues/477
+          - "github.com/wasilibs/go-shellcheck/cmd/shellcheck@v0.10.0"
