@@ -19,7 +19,7 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "mongo"
-        versions: ["~> 4.4"]
+        versions: [">= 5"]
 
   - package-ecosystem: "docker-compose"
     directories:
@@ -28,4 +28,4 @@ updates:
       interval: "weekly"
     ignore:
       - dependency-name: "mongo"
-        versions: ["~> 4.4"]
+        versions: [">= 5"]
