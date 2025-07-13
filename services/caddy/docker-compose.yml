@@ -19,6 +19,7 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       CADDY_INGRESS_NETWORKS: proxy-internal
+      ENVIRONMENT: ${ENVIRONMENT:?error}
       EMAIL: ${EMAIL:?error}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?error}
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
@@ -26,6 +27,7 @@ services:
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
       HEXOS_HOST: ${HEXOS_HOST:?error}
       HAOS_HOST: ${HAOS_HOST:?error}
+      SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
 
   caddy-config:
     image: traefik/whoami:latest
