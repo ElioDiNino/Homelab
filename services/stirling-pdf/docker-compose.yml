@@ -54,6 +54,14 @@ services:
     labels:
       caddy: "pdf.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
+      caddy.header.Content-Security-Policy: >
+        "
+        default-src 'self' blob: data: 'unsafe-inline';
+        connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://*.sentry.io;
+        report-uri {$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT};
+        report-to csp-endpoint;
+        "
+      caddy.header.Reporting-Endpoints: csp-endpoint="{$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT}"
 
 volumes:
   data:
