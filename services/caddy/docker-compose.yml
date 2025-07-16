@@ -28,6 +28,8 @@ services:
       HEXOS_HOST: ${HEXOS_HOST:?error}
       HAOS_HOST: ${HAOS_HOST:?error}
       SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
+    labels:
+      diun.enable: true
 
   caddy-config:
     image: traefik/whoami:latest
@@ -35,6 +37,8 @@ services:
     networks:
       - proxy-internal
     labels:
+      diun.enable: true
+
       #### Global Settings ####
       caddy_0.email: "{env.EMAIL}"
       caddy_0.acme_dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"

@@ -52,6 +52,7 @@ services:
     networks:
       - proxy-internal
     labels:
+      diun.enable: true
       caddy: "pdf.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
       caddy.header.Content-Security-Policy: >

@@ -14,6 +14,7 @@ services:
     networks:
       - proxy-internal
     labels:
+      diun.enable: true
       caddy: "portainer.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 9443 }}"
       caddy.reverse_proxy.import: https
