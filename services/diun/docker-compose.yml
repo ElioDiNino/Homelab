@@ -1,0 +1,18 @@
+services:
+  diun:
+    image: crazymax/diun:latest
+    command: serve
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - data:/data
+    environment:
+      TZ: "America/Toronto"
+      DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
+      DIUN_PROVIDERS_DOCKER: true
+      DIUN_NOTIF_DISCORD_WEBHOOKURL: ${DISCORD_WEBHOOK_URL:?error}
+    labels:
+      diun.enable: true
+    restart: always
+
+volumes:
+  data:

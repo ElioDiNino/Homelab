@@ -19,6 +19,7 @@ services:
       - proxy-internal
       - default
     labels:
+      diun.enable: true
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.handle_path: "/api/*"
       caddy.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
@@ -40,6 +41,7 @@ services:
     networks:
       - proxy-internal
     labels:
+      diun.enable: true
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "* {{ upstreams 3000 }}"
 
