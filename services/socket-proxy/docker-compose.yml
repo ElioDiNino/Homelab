@@ -1,0 +1,17 @@
+services:
+  socket-proxy:
+    image: 11notes/socket-proxy:2
+    restart: always
+    read_only: true
+    user: 0:${GID:?error}
+    volumes:
+      - /var/run/docker.sock:/run/docker.sock:ro
+      - socket-proxy:/run/proxy
+    environment:
+      TZ: "America/Toronto"
+    labels:
+      diun.enable: true
+
+volumes:
+  socket-proxy:
+    name: socket-proxy
