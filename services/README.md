@@ -48,6 +48,10 @@ I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due
 
 [Docker Image Update Notifier (Diun)](https://crazymax.dev/diun/) is an application for receiving notifications when a Docker image is updated on a Docker registry. I use it to monitor my important containers and notify me via 3rd-party integrations when a new image version is found.
 
+### [Docker Socket Proxy](./socket-proxy/)
+
+Due to some services' reliance on connection to the docker socket, I use [Docker Socket Proxy](https://github.com/11notes/docker-socket-proxy) to securely expose the Docker API to my services in read-only mode without giving them direct access to the Docker daemon (with the exception of Portainer, which requires full access).
+
 ### [Stirling PDF](./stirling-pdf/)
 
 I use [Stirling PDF](https://www.stirlingpdf.com/) for all my PDF needs. It is a self-hosted tool that allows you to merge, split, and manipulate PDF files easily without giving up your privacy.
