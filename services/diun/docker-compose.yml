@@ -3,7 +3,7 @@ services:
     image: crazymax/diun:latest
     command: serve
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - socket-proxy:/var/run:ro
       - data:/data
     environment:
       TZ: "America/Toronto"
@@ -16,3 +16,5 @@ services:
 
 volumes:
   data:
+  socket-proxy:
+    external: true
