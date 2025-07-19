@@ -20,7 +20,7 @@ services:
     environment:
       CADDY_INGRESS_NETWORKS: proxy-internal
       ENVIRONMENT: ${ENVIRONMENT:?error}
-      EMAIL: ${EMAIL:?error}
+      CERTIFICATES_EMAIL: ${CERTIFICATES_EMAIL:?error}
       CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?error}
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
@@ -40,7 +40,7 @@ services:
       diun.enable: true
 
       #### Global Settings ####
-      caddy_0.email: "{env.EMAIL}"
+      caddy_0.email: "{env.CERTIFICATES_EMAIL}"
       caddy_0.acme_dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
       caddy_0.dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
       caddy_0.ech: "ech.{$$INTERNAL_DOMAIN}"
