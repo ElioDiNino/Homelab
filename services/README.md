@@ -48,6 +48,10 @@ I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due
 
 [Beszel](https://beszel.dev/) is a lightweight server monitoring platform that includes Docker statistics, historical data, and alert functions. I use it as the main monitoring tool for my homelab, providing insights into the performance and health of my services.
 
+### [Pocket ID](./pocket-id/)
+
+My authentication service of choice is [Pocket ID](https://pocket-id.org/). It is a self-hosted identity provider that supports OpenID Connect and OAuth 2.0, allowing me to manage user authentication and authorization for my applications securely. I chose it for its simplicity, clean UI, ease of integration, and focus on passwordless authentication.
+
 ### [Diun](./diun/)
 
 [Docker Image Update Notifier (Diun)](https://crazymax.dev/diun/) is an application for receiving notifications when a Docker image is updated on a Docker registry. I use it to monitor my important containers and notify me via 3rd-party integrations when a new image version is found.

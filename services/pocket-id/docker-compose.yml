@@ -1,0 +1,32 @@
+services:
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v1
+    restart: unless-stopped
+    volumes:
+      - data:/app/data
+    healthcheck:
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      interval: 1m30s
+      timeout: 5s
+      retries: 2
+      start_period: 10s
+    environment:
+      APP_URL: "https://id.${INTERNAL_DOMAIN:?error}"
+      TRUST_PROXY: true
+      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:?error}
+      ENCRYPTION_KEY: ${POCKET_ID_ENCRYPTION_KEY:?error}
+      PUID: ${POCKET_ID_UID:?error}
+      PGID: ${POCKET_ID_GID:?error}
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      caddy: "id.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 1411 }}"
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true
