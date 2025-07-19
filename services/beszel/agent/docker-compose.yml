@@ -4,7 +4,7 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - socket-proxy:/var/run/docker.sock:ro
+      - socket-proxy:/var/run:ro
     healthcheck:
       test: ["CMD", "/agent", "health"]
       start_period: 5s
