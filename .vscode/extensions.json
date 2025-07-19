@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dotenv.dotenv-vscode",
+    "docker.docker",
+    "ms-azuretools.vscode-containers",
+    "github.vscode-github-actions",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
