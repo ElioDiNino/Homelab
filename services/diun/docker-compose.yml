@@ -1,18 +1,25 @@
 services:
   diun:
-    image: crazymax/diun:latest
+    image: ghcr.io/crazy-max/diun:latest
     command: serve
     volumes:
-      - socket-proxy:/var/run:ro
       - data:/data
+      - socket-proxy:/socket-proxy:ro
+    secrets:
+      - discord_webhook_url
     environment:
       TZ: ${TIMEZONE:?error}
       DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
       DIUN_PROVIDERS_DOCKER: true
-      DIUN_NOTIF_DISCORD_WEBHOOKURL: ${DISCORD_WEBHOOK_URL:?error}
+      DIUN_PROVIDERS_DOCKER_ENDPOINT: unix:///socket-proxy/docker.sock
+      DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
     labels:
       diun.enable: true
     restart: always
+
+secrets:
+  discord_webhook_url:
+    environment: DISCORD_WEBHOOK_URL
 
 volumes:
   data:
