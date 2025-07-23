@@ -9,12 +9,12 @@ services:
       test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
       start_period: 5s
       interval: 120s
+    networks:
+      - proxy-internal
     environment:
       APP_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       SHARE_ALL_SYSTEMS: true
       USER_CREATION: true
-    networks:
-      - proxy-internal
     labels:
       diun.enable: true
       caddy: "beszel.{$$INTERNAL_DOMAIN}"
