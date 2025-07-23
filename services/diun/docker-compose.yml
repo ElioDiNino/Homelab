@@ -7,6 +7,7 @@ services:
       - socket-proxy:/socket-proxy:ro
     secrets:
       - discord_webhook_url
+      - gotify_token
     environment:
       TZ: ${TIMEZONE:?error}
       DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
@@ -15,6 +16,8 @@ services:
       DIUN_DEFAULTS_SORTTAGS: semver
       DIUN_DEFAULTS_INCLUDETAGS: ^v?\d+$
       DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
+      DIUN_NOTIF_GOTIFY_ENDPOINT: "https://gotify.${INTERNAL_DOMAIN:?error}"
+      DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token
     labels:
       diun.enable: true
     restart: always
@@ -22,6 +25,8 @@ services:
 secrets:
   discord_webhook_url:
     environment: DISCORD_WEBHOOK_URL
+  gotify_token:
+    environment: DIUN_GOTIFY_TOKEN
 
 volumes:
   data:
