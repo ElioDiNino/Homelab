@@ -1,6 +1,6 @@
 services:
   diun:
-    image: ghcr.io/crazy-max/diun:latest
+    image: ghcr.io/crazy-max/diun:4
     command: serve
     volumes:
       - data:/data

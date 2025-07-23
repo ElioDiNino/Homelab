@@ -1,6 +1,6 @@
 services:
   server:
-    image: yooooomi/your_spotify_server
+    image: ghcr.io/yooooomi/your_spotify_server:latest
     restart: unless-stopped
     links:
       - mongo
@@ -34,7 +34,7 @@ services:
       - default
 
   web:
-    image: yooooomi/your_spotify_client
+    image: ghcr.io/yooooomi/your_spotify_client:latest
     restart: unless-stopped
     environment:
       API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
