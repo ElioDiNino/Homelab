@@ -1,6 +1,6 @@
 services:
   beszel:
-    image: henrygd/beszel:latest
+    image: henrygd/beszel:0
     restart: unless-stopped
     volumes:
       - data:/beszel_data
@@ -12,6 +12,7 @@ services:
     environment:
       APP_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       SHARE_ALL_SYSTEMS: true
+      USER_CREATION: true
     networks:
       - proxy-internal
     labels:
@@ -20,7 +21,7 @@ services:
       caddy.reverse_proxy: "{{ upstreams 8090 }}"
 
   beszel-local-agent:
-    image: henrygd/beszel-agent:latest
+    image: henrygd/beszel-agent:0
     restart: unless-stopped
     depends_on:
       beszel:
@@ -28,16 +29,23 @@ services:
     network_mode: host
     volumes:
       - beszel-socket:/beszel_socket
-      - socket-proxy:/var/run:ro
+      - socket-proxy:/socket-proxy:ro
     healthcheck:
       test: ["CMD", "/agent", "health"]
       start_period: 5s
       interval: 120s
+    secrets:
+      - agent_key
     environment:
       LISTEN: /beszel_socket/beszel.sock
-      KEY: "${BESZEL_LOCAL_AGENT_KEY:?error}"
+      DOCKER_HOST: unix:///socket-proxy/docker.sock
+      KEY_FILE: /run/secrets/agent_key
     labels:
       diun.enable: true
+
+secrets:
+  agent_key:
+    environment: BESZEL_LOCAL_AGENT_KEY
 
 volumes:
   data:
