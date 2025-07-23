@@ -1,6 +1,6 @@
 services:
   beszel:
-    image: henrygd/beszel:latest
+    image: henrygd/beszel:0
     restart: unless-stopped
     volumes:
       - data:/beszel_data
@@ -20,7 +20,7 @@ services:
       caddy.reverse_proxy: "{{ upstreams 8090 }}"
 
   beszel-local-agent:
-    image: henrygd/beszel-agent:latest
+    image: henrygd/beszel-agent:0
     restart: unless-stopped
     depends_on:
       beszel:
