@@ -36,6 +36,7 @@ services:
       SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
     labels:
       diun.enable: true
+      diun.include_tags: latest
 
   caddy-config:
     image: traefik/whoami:latest
@@ -44,6 +45,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
+      diun.include_tags: latest
 
       #### Global Settings ####
       caddy_0.email: "{env.CERTIFICATES_EMAIL}"
@@ -101,12 +103,12 @@ secrets:
   cloudflare_api_token:
     environment: CLOUDFLARE_API_TOKEN
 
-networks:
-  proxy-internal:
-    external: true
-
 volumes:
   data:
   config:
   socket-proxy:
+    external: true
+
+networks:
+  proxy-internal:
     external: true

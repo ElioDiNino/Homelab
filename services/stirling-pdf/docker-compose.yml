@@ -1,7 +1,7 @@
 services:
   # Workaround for volume mount sub-paths not existing (see https://github.com/moby/moby/issues/47842)
   volume_instantiation:
-    image: "alpine:latest"
+    image: alpine:latest
     command: |
       mkdir -p /srv/stirling-pdf/configs /srv/stirling-pdf/logs /srv/stirling-pdf/customFiles /srv/stirling-pdf/pipeline /srv/stirling-pdf/trainingData
     volumes:
@@ -53,6 +53,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
+      diun.include_tags: latest-fat
       caddy: "pdf.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
       caddy.header.Content-Security-Policy: >
