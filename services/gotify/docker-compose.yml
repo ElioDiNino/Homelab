@@ -1,0 +1,21 @@
+services:
+  gotify:
+    image: ghcr.io/gotify/server:2
+    restart: unless-stopped
+    volumes:
+      - data:/app/data
+    environment:
+      TZ: ${TIMEZONE:?error}
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      caddy: "gotify.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 80 }}"
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true
