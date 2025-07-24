@@ -10,11 +10,13 @@ services:
       timeout: 5s
       retries: 2
       start_period: 10s
+    secrets:
+      - encryption_key
     environment:
       APP_URL: "https://id.${INTERNAL_DOMAIN:?error}"
       TRUST_PROXY: true
       MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:?error}
-      ENCRYPTION_KEY: ${POCKET_ID_ENCRYPTION_KEY:?error}
+      ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
       PUID: ${POCKET_ID_UID:?error}
       PGID: ${POCKET_ID_GID:?error}
     networks:
@@ -23,6 +25,10 @@ services:
       diun.enable: true
       caddy: "id.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 1411 }}"
+
+secrets:
+  encryption_key:
+    environment: POCKET_ID_ENCRYPTION_KEY
 
 volumes:
   data:

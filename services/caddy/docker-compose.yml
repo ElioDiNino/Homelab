@@ -4,9 +4,9 @@ services:
     build: .
     restart: unless-stopped
     volumes:
-      - socket-proxy:/var/run:ro
       - data:/data
       - config:/config
+      - socket-proxy:/socket-proxy:ro
     ports:
       - 80:80
       - 443:443
@@ -15,13 +15,19 @@ services:
       - NET_ADMIN
     networks:
       - proxy-internal
+    secrets:
+      - cloudflare_api_token
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
+      # Docker Proxy configuration
+      DOCKER_HOST: unix:///socket-proxy/docker.sock
       CADDY_INGRESS_NETWORKS: proxy-internal
+
+      # Caddyfile variables
+      CLOUDFLARE_API_TOKEN_FILE: /run/secrets/cloudflare_api_token
       ENVIRONMENT: ${ENVIRONMENT:?error}
       CERTIFICATES_EMAIL: ${CERTIFICATES_EMAIL:?error}
-      CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN:?error}
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
@@ -30,6 +36,7 @@ services:
       SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
     labels:
       diun.enable: true
+      diun.include_tags: latest
 
   caddy-config:
     image: traefik/whoami:latest
@@ -38,11 +45,12 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
+      diun.include_tags: latest
 
       #### Global Settings ####
       caddy_0.email: "{env.CERTIFICATES_EMAIL}"
-      caddy_0.acme_dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
-      caddy_0.dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
+      caddy_0.acme_dns: "cloudflare {file.{$$CLOUDFLARE_API_TOKEN_FILE}}"
+      caddy_0.dns: "cloudflare {file.{$$CLOUDFLARE_API_TOKEN_FILE}}"
       caddy_0.ech: "ech.{$$INTERNAL_DOMAIN}"
 
       # When debugging, use debug flag and staging server
@@ -53,7 +61,7 @@ services:
 
       # Get wildcard certificate
       caddy_1: (wildcard)
-      caddy_1.tls.dns: "cloudflare {env.CLOUDFLARE_API_TOKEN}"
+      caddy_1.tls.dns: "cloudflare {file.{$$CLOUDFLARE_API_TOKEN_FILE}}"
       caddy_1.tls.resolvers: 1.1.1.1 1.0.0.1
 
       # Skip TLS verify for backend with self-signed HTTPS
@@ -91,12 +99,16 @@ services:
       caddy_103: "ha.{$$INTERNAL_DOMAIN}"
       caddy_103.reverse_proxy: "{$$HAOS_HOST}:8123"
 
-networks:
-  proxy-internal:
-    external: true
+secrets:
+  cloudflare_api_token:
+    environment: CLOUDFLARE_API_TOKEN
 
 volumes:
   data:
   config:
   socket-proxy:
+    external: true
+
+networks:
+  proxy-internal:
     external: true

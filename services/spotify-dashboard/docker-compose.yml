@@ -1,6 +1,6 @@
 services:
   server:
-    image: yooooomi/your_spotify_server
+    image: ghcr.io/yooooomi/your_spotify_server:latest
     restart: unless-stopped
     links:
       - mongo
@@ -20,6 +20,7 @@ services:
       - default
     labels:
       diun.enable: true
+      diun.include_tags: latest
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.handle_path: "/api/*"
       caddy.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
@@ -34,7 +35,7 @@ services:
       - default
 
   web:
-    image: yooooomi/your_spotify_client
+    image: ghcr.io/yooooomi/your_spotify_client:latest
     restart: unless-stopped
     environment:
       API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
@@ -42,6 +43,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
+      diun.include_tags: latest
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "* {{ upstreams 3000 }}"
 

@@ -1,6 +1,6 @@
 services:
   beszel:
-    image: henrygd/beszel:0
+    image: ghcr.io/henrygd/beszel/beszel:0
     restart: unless-stopped
     volumes:
       - data:/beszel_data
@@ -9,19 +9,19 @@ services:
       test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
       start_period: 5s
       interval: 120s
+    networks:
+      - proxy-internal
     environment:
       APP_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       SHARE_ALL_SYSTEMS: true
       USER_CREATION: true
-    networks:
-      - proxy-internal
     labels:
       diun.enable: true
       caddy: "beszel.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8090 }}"
 
   beszel-local-agent:
-    image: henrygd/beszel-agent:0
+    image: ghcr.io/henrygd/beszel/beszel-agent:0
     restart: unless-stopped
     depends_on:
       beszel:

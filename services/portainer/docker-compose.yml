@@ -15,15 +15,16 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
+      diun.include_tags: latest
       caddy: "portainer.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 9443 }}"
       caddy.reverse_proxy.import: https
 
-networks:
-  proxy-internal:
-    external: true
-
 volumes:
   data:
     name: portainer_data
+    external: true
+
+networks:
+  proxy-internal:
     external: true
