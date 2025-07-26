@@ -36,18 +36,21 @@ services:
       interval: 120s
     secrets:
       - agent_key
+      - agent_token
     environment:
       LISTEN: /beszel_socket/beszel.sock
       DOCKER_HOST: unix:///socket-proxy/docker.sock
       HUB_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       KEY_FILE: /run/secrets/agent_key
-      TOKEN: ${BESZEL_LOCAL_AGENT_TOKEN:?error}
+      TOKEN_FILE: /run/secrets/agent_token
     labels:
       diun.enable: true
 
 secrets:
   agent_key:
     environment: BESZEL_LOCAL_AGENT_KEY
+  agent_token:
+    environment: BESZEL_LOCAL_AGENT_TOKEN
 
 volumes:
   data:
