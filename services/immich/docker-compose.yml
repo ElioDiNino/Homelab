@@ -1,0 +1,98 @@
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - database
+    # extends:
+    #   file: hwaccel.transcoding.yml
+    #   service: quicksync
+    volumes:
+      - uploads:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      disable: false
+    secrets:
+      - db_name
+      - db_username
+      - db_password
+    environment:
+      TZ: ${TIMEZONE:?error}
+      DB_DATABASE_NAME_FILE: /run/secrets/db_name
+      DB_USERNAME_FILE: /run/secrets/db_username
+      DB_PASSWORD_FILE: /run/secrets/db_password
+      REDIS_PASSWORD: ${IMMICH_CACHE_PASSWORD:?error}
+      IMMICH_TRUSTED_PROXIES: 172.16.0.0/12
+    networks:
+      - default
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.include_tags: release
+      caddy: "photos.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 2283 }}"
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    restart: unless-stopped
+    volumes:
+      - model-cache:/cache
+    healthcheck:
+      disable: false
+    networks:
+      - default
+    labels:
+      diun.enable: true
+      diun.include_tags: release
+
+  redis:
+    image: docker.io/valkey/valkey:8-bookworm@sha256:facc1d2c3462975c34e10fccb167bfa92b0e0dbd992fc282c29a61c3243afb11
+    restart: unless-stopped
+    healthcheck:
+      test: valkey-cli ping || exit 1
+    environment:
+      VALKEY_EXTRA_FLAGS: "--requirepass ${IMMICH_CACHE_PASSWORD:?error}"
+    networks:
+      - default
+
+  database:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:5f6a838e4e44c8e0e019d0ebfe3ee8952b69afc2809b2c25f7b0119641978e91
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    shm_size: 128mb
+    secrets:
+      - db_name
+      - db_username
+      - db_password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/db_name
+      POSTGRES_USER_FILE: /run/secrets/db_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    networks:
+      - default
+
+secrets:
+  db_name:
+    environment: IMMICH_DB_DATABASE_NAME
+  db_username:
+    environment: IMMICH_DB_USERNAME
+  db_password:
+    environment: IMMICH_DB_PASSWORD
+
+volumes:
+  model-cache:
+  db-data:
+  uploads:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: //${HEXOS_HOST:?error}/Immich/${ENVIRONMENT:?error}
+      o: username=${IMMICH_HEXOS_USERNAME:?error},password=${IMMICH_HEXOS_PASSWORD:?error},vers=3.0
+
+networks:
+  default:
+  proxy-internal:
+    external: true
