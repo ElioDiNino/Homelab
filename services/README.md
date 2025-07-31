@@ -17,6 +17,7 @@ cp .env.example .env
 
 ```sh
 sudo docker network create proxy-internal
+sudo docker network create proxy-external
 sudo docker compose up -d
 ```
 
@@ -59,6 +60,16 @@ My authentication service of choice is [Pocket ID](https://pocket-id.org/). It i
 ### [Docker Socket Proxy](./socket-proxy/)
 
 Due to some services' reliance on connection to the docker socket, I use [Docker Socket Proxy](https://github.com/11notes/docker-socket-proxy) to securely expose the Docker API to my services in read-only mode without giving them direct access to the Docker daemon (with the exception of Portainer, which requires full access).
+
+### [Immich](./immich/)
+
+[Immich](https://immich.app/) is a self-hosted photo and video storage solution with functionality similar to Google Photos. It allows you to automatically back up your photos and videos from your devices, providing a web interface to view and manage your media. It is my primary photo and video management solution.
+
+I also run [Immich Public Proxy](https://github.com/alangrainger/immich-public-proxy) to provide secure external access to link shares and public albums without exposing the main Immich server directly to the internet.
+
+### [Cloudflared](./cloudflared/)
+
+To facilitate secure public access to a subset of my services, I use [Cloudflared](https://github.com/cloudflare/cloudflared) to create secure tunnels to my internal services. This allows me to expose specific services to the internet without exposing my entire network.
 
 ### [Stirling PDF](./stirling-pdf/)
 

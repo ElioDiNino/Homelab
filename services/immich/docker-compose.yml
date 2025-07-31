@@ -25,13 +25,71 @@ services:
       REDIS_PASSWORD: ${IMMICH_CACHE_PASSWORD:?error}
       IMMICH_TRUSTED_PROXIES: 172.16.0.0/12
     networks:
-      - default
+      - frontend
+      - backend
       - proxy-internal
     labels:
       diun.enable: true
       diun.include_tags: release
       caddy: "photos.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 2283 }}"
+
+  immich-public-proxy:
+    image: ghcr.io/alangrainger/immich-public-proxy:latest
+    restart: unless-stopped
+    depends_on:
+      immich-server:
+        condition: service_healthy
+    healthcheck:
+      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
+      start_period: 10s
+      timeout: 5s
+    networks:
+      - frontend
+      - proxy-external
+    environment:
+      PUBLIC_BASE_URL: https://${IMMICH_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
+      IMMICH_URL: http://immich-server:2283
+      CONFIG: |
+        {
+          "ipp": {
+            "responseHeaders": {
+              "Cache-Control": "public, max-age=2592000",
+              "Access-Control-Allow-Origin":  "*"
+            },
+            "singleImageGallery": false,
+            "singleItemAutoOpen": true,
+            "downloadOriginalPhoto": true,
+            "allowDownloadAll": 1,
+            "showHomePage": true,
+            "showGalleryTitle": true,
+            "showMetadata": {
+              "description": true
+            },
+            "customInvalidResponse": false
+          },
+          "lightGallery": {
+            "controls": true,
+            "download": true,
+            "loop": false,
+            "allowMediaOverlap": true,
+
+            "thumbnail": true,
+            "toggleThumb": true,
+
+            "autoplayFirstVideo": false,
+            "gotoNextSlideOnVideoEnd": false,
+
+            "mobileSettings": {
+              "controls": false,
+              "showCloseIcon": true,
+              "download": true
+            }
+          }
+        }
+    labels:
+      diun.enable: true
+      diun.include_tags: latest
 
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:release
@@ -41,7 +99,7 @@ services:
     healthcheck:
       disable: false
     networks:
-      - default
+      - backend
     labels:
       diun.enable: true
       diun.include_tags: release
@@ -54,7 +112,7 @@ services:
     environment:
       VALKEY_EXTRA_FLAGS: "--requirepass ${IMMICH_CACHE_PASSWORD:?error}"
     networks:
-      - default
+      - backend
 
   database:
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:5f6a838e4e44c8e0e019d0ebfe3ee8952b69afc2809b2c25f7b0119641978e91
@@ -72,7 +130,7 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_INITDB_ARGS: "--data-checksums"
     networks:
-      - default
+      - backend
 
 secrets:
   db_name:
@@ -93,6 +151,9 @@ volumes:
       o: username=${IMMICH_HEXOS_USERNAME:?error},password=${IMMICH_HEXOS_PASSWORD:?error},vers=3.0
 
 networks:
-  default:
+  frontend:
+  backend:
   proxy-internal:
+    external: true
+  proxy-external:
     external: true
