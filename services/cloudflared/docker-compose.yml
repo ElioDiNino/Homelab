@@ -1,0 +1,26 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel run
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    secrets:
+      - tunnel_token
+    environment:
+      TUNNEL_TOKEN_FILE: /run/secrets/tunnel_token
+      NO_AUTOUPDATE: true
+    networks:
+      - proxy-external
+    labels:
+      diun.enable: true
+      diun.include_tags: latest
+
+secrets:
+  tunnel_token:
+    environment: CLOUDFLARED_TOKEN
+
+networks:
+  proxy-external:
+    external: true
