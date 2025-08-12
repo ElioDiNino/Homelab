@@ -12,11 +12,13 @@ services:
       start_period: 10s
     secrets:
       - encryption_key
+      - maxmind_license_key
     environment:
       APP_URL: "https://id.${INTERNAL_DOMAIN:?error}"
       TRUST_PROXY: true
-      MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY:?error}
+      KEYS_STORAGE: database
       ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
+      MAXMIND_LICENSE_KEY_FILE: /run/secrets/maxmind_license_key
       PUID: ${POCKET_ID_UID:?error}
       PGID: ${POCKET_ID_GID:?error}
     networks:
@@ -29,6 +31,8 @@ services:
 secrets:
   encryption_key:
     environment: POCKET_ID_ENCRYPTION_KEY
+  maxmind_license_key:
+    environment: MAXMIND_LICENSE_KEY
 
 volumes:
   data:
