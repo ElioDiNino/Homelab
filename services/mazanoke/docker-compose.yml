@@ -1,0 +1,15 @@
+services:
+  mazanoke:
+    image: ghcr.io/civilblur/mazanoke:latest
+    restart: unless-stopped
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.include_tags: latest
+      caddy: "optimize.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 80 }}"
+
+networks:
+  proxy-internal:
+    external: true

@@ -78,3 +78,7 @@ I use [Stirling PDF](https://www.stirlingpdf.com/) for all my PDF needs. It is a
 ### [Spotify Dashboard](./spotify-dashboard/)
 
 [Spotify Dashboard](https://github.com/Yooooomi/your_spotify) is purely for displaying historical listening data. It is not a replacement for the Spotify app, but rather a nice tool to visualize your listening habits and statistics over time.
+
+### [Mazanoke](./mazanoke/)
+
+I run [Mazanoke](https://mazanoke.com/) for easy photo compression and conversion. It provides a clean web interface and runs completely in the browser, making it a convenient tool for quick image processing tasks.
