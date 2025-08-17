@@ -99,6 +99,7 @@ services:
     healthcheck:
       disable: false
     networks:
+      - outgoing
       - backend
     labels:
       diun.enable: true
@@ -152,7 +153,9 @@ volumes:
 
 networks:
   frontend:
+  outgoing:
   backend:
+    internal: true
   proxy-internal:
     external: true
   proxy-external:

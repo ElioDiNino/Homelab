@@ -2,8 +2,6 @@ services:
   server:
     image: ghcr.io/yooooomi/your_spotify_server:latest
     restart: unless-stopped
-    links:
-      - mongo
     depends_on:
       - mongo
     environment:
@@ -17,7 +15,7 @@ services:
       PROMETHEUS_PASSWORD: ${PROMETHEUS_PASSWORD:?error}
     networks:
       - proxy-internal
-      - default
+      - database
     labels:
       diun.enable: true
       diun.include_tags: latest
@@ -32,7 +30,7 @@ services:
     volumes:
       - data:/data/db
     networks:
-      - default
+      - database
 
   web:
     image: ghcr.io/yooooomi/your_spotify_client:latest
@@ -51,6 +49,7 @@ volumes:
   data:
 
 networks:
-  default:
+  database:
+    internal: true
   proxy-internal:
     external: true
