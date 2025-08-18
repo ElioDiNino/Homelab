@@ -86,3 +86,7 @@ I run [Mazanoke](https://mazanoke.com/) for easy photo compression and conversio
 ### [ConvertX](./convertx/)
 
 [ConvertX](https://github.com/C4illin/ConvertX) is a file conversion service that allows you to convert various file types easily from a simple web interface.
+
+### [IT Tools](./it-tools/)
+
+[IT Tools](https://github.com/sharevb/it-tools) is a collection of useful tools for IT professionals and software developers, including key generators, network tools, cheat sheets, and more.

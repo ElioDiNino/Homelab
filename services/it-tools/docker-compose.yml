@@ -1,0 +1,15 @@
+services:
+  it-tools:
+    image: ghcr.io/sharevb/it-tools:latest
+    restart: unless-stopped
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.include_tags: latest
+      caddy: "tools.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 8080 }}"
+
+networks:
+  proxy-internal:
+    external: true
