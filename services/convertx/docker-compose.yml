@@ -1,0 +1,25 @@
+services:
+  convertx:
+    image: ghcr.io/c4illin/convertx:latest
+    restart: unless-stopped
+    volumes:
+      - data:/app/data
+    environment:
+      TZ: ${TIMEZONE:?error}
+      ACCOUNT_REGISTRATION: false
+      ALLOW_UNAUTHENTICATED: true
+      AUTO_DELETE_EVERY_N_HOURS: 1
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.include_tags: latest
+      caddy: "convert.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 3000 }}"
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true
