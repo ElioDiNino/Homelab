@@ -1,12 +1,12 @@
 services:
   it-tools:
-    image: ghcr.io/sharevb/it-tools:latest
+    image: ghcr.io/sharevb/it-tools:2025.8.6-0325b117
     restart: unless-stopped
     networks:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.include_tags: ^\d+\.\d+\.\d+(-\w+)?$
       caddy: "tools.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
 
