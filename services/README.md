@@ -71,6 +71,10 @@ I also run [Immich Public Proxy](https://github.com/alangrainger/immich-public-p
 
 To facilitate secure public access to a subset of my services, I use [Cloudflared](https://github.com/cloudflare/cloudflared) to create secure tunnels to my internal services. This allows me to expose specific services to the internet without exposing my entire network.
 
+### [Plausible](./plausible/)
+
+[Plausible](https://plausible.io/) is a web analytics tool that is privacy-friendly and compliant with GDPR. It provides insights into website traffic without compromising user privacy. I use it to track and analyze the traffic to my internal and external services.
+
 ### [Stirling PDF](./stirling-pdf/)
 
 I use [Stirling PDF](https://www.stirlingpdf.com/) for all my PDF needs. It is a self-hosted tool that allows you to merge, split, and manipulate PDF files easily without giving up your privacy.
