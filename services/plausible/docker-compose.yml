@@ -1,0 +1,108 @@
+services:
+  plausible_db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      start_period: 1m
+    secrets:
+      - db-password
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    networks:
+      - database
+
+  plausible_events_db:
+    image: clickhouse/clickhouse-server:24.12-alpine
+    restart: unless-stopped
+    volumes:
+      - event-data:/var/lib/clickhouse
+      - event-logs:/var/log/clickhouse-server
+      - ./clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
+      # This makes ClickHouse bind to IPv4 only, since Docker doesn't enable IPv6 in bridge networks by default.
+      # Fixes "Listen [::]:9000 failed: Address family for hostname not supported" warnings.
+      - ./clickhouse/ipv4-only.xml:/etc/clickhouse-server/config.d/ipv4-only.xml:ro
+      # This makes ClickHouse consume less resources, which is useful for small setups.
+      # https://clickhouse.com/docs/en/operations/tips#using-less-than-16gb-of-ram
+      - ./clickhouse/low-resources.xml:/etc/clickhouse-server/config.d/low-resources.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:8123/ping || exit 1"]
+      start_period: 1m
+    environment:
+      CLICKHOUSE_SKIP_USER_SETUP: 1
+    networks:
+      - database
+
+  plausible:
+    image: ghcr.io/plausible/community-edition:v3
+    restart: unless-stopped
+    command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
+    depends_on:
+      plausible_db:
+        condition: service_healthy
+      plausible_events_db:
+        condition: service_healthy
+    volumes:
+      - plausible-data:/var/lib/plausible
+    ulimits:
+      nofile:
+        soft: 65535
+        hard: 65535
+    secrets:
+      - SECRET_KEY_BASE
+      - MAXMIND_LICENSE_KEY
+      - SMTP_USER_NAME
+      - SMTP_USER_PWD
+    environment:
+      TMPDIR: /var/lib/plausible/tmp
+      # Ref: https://github.com/plausible/community-edition/wiki/configuration
+      BASE_URL: https://analytics.${INTERNAL_DOMAIN:?error}
+      CONFIG_DIR: /run/secrets
+      HTTP_PORT: 8000
+      DISABLE_REGISTRATION: invite_only
+      ENABLE_EMAIL_VERIFICATION: true
+      DATABASE_URL: postgres://postgres:${PLAUSIBLE_DB_PASSWORD:?error}@plausible_db:5432/plausible_db
+      MAXMIND_EDITION: GeoLite2-City
+      MAILER_ADAPTER: Bamboo.Mua
+      MAILER_EMAIL: ${SMTP_EMAIL:?error}
+      MAILER_NAME: Plausible Analytics
+      SMTP_HOST_ADDR: ${SMTP_HOST_ADDR:?error}
+      SMTP_HOST_PORT: ${SMTP_HOST_PORT:?error}
+      SMTP_HOST_SSL_ENABLED: ${SMTP_HOST_SSL_ENABLED:?error}
+    networks:
+      - database
+      - proxy-internal
+    labels:
+      diun.enable: true
+      caddy: "analytics.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{ upstreams 8000 }}"
+
+secrets:
+  db-password:
+    environment: PLAUSIBLE_DB_PASSWORD
+  SECRET_KEY_BASE:
+    environment: PLAUSIBLE_SECRET_KEY
+  MAXMIND_LICENSE_KEY:
+    environment: MAXMIND_LICENSE_KEY
+  SMTP_USER_NAME:
+    environment: SMTP_USER_NAME
+  SMTP_USER_PWD:
+    environment: SMTP_USER_PWD
+
+volumes:
+  db-data:
+  event-data:
+  event-logs:
+  plausible-data:
+
+networks:
+  database:
+    internal: true
+  proxy-internal:
+    external: true
