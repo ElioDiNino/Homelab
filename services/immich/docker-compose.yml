@@ -44,9 +44,6 @@ services:
       test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
       start_period: 10s
       timeout: 5s
-    networks:
-      - frontend
-      - proxy-external
     environment:
       PUBLIC_BASE_URL: https://${IMMICH_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
       IMMICH_URL: http://immich-server:2283
@@ -87,6 +84,9 @@ services:
             }
           }
         }
+    networks:
+      - frontend
+      - proxy-external
     labels:
       diun.enable: true
       diun.include_tags: latest
@@ -106,7 +106,7 @@ services:
       diun.include_tags: release
 
   redis:
-    image: docker.io/valkey/valkey:8-bookworm@sha256:facc1d2c3462975c34e10fccb167bfa92b0e0dbd992fc282c29a61c3243afb11
+    image: docker.io/valkey/valkey:8-bookworm@sha256:a137a2b60aca1a75130022d6bb96af423fefae4eb55faf395732db3544803280
     restart: unless-stopped
     healthcheck:
       test: valkey-cli ping || exit 1
