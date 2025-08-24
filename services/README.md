@@ -18,6 +18,7 @@ cp .env.example .env
 ```sh
 sudo docker network create proxy-internal
 sudo docker network create proxy-external
+sudo docker network create proxy-plausible --internal
 sudo docker compose up -d
 ```
 
@@ -94,3 +95,95 @@ I run [Mazanoke](https://mazanoke.com/) for easy photo compression and conversio
 ### [IT Tools](./it-tools/)
 
 [IT Tools](https://github.com/sharevb/it-tools) is a collection of useful tools for IT professionals and software developers, including key generators, network tools, cheat sheets, and more.
+
+## Network Diagram
+
+```mermaid
+graph TB
+    %% Groups
+
+    subgraph "External Access"
+        EXT[External Users]
+        CF[Cloudflare]
+    end
+
+    subgraph "Internal Access"
+        INT[Internal Users]
+        TAILSCALE[Tailscale]
+    end
+
+    subgraph "Homelab Network"
+        subgraph "Network Infrastructure"
+            CF_TUNNEL[Cloudflare Tunnel]
+            CADDY_EXT[External Reverse Proxy]
+            IMMICH_PROXY[Immich Public Proxy]
+            CADDY_INT[Internal Reverse Proxy]
+        end
+
+        subgraph "User Services"
+            IMMICH[Immich]
+            PLAUSIBLE[Plausible]
+            PORTAINER[Portainer]
+            BESZEL_HUB[Beszel Hub]
+            POCKET_ID[Pocket ID]
+            GOTIFY[Gotify]
+            STIRLING[Stirling PDF]
+            MAZANOKE[Mazanoke]
+            CONVERTX[ConvertX]
+            IT_TOOLS[IT Tools]
+            SPOTIFY[Spotify Dashboard]
+        end
+
+        subgraph "Infrastructure Services"
+            DIUN[Diun]
+            BESZEL_AGENT[Beszel Agent]
+            SOCKET_PROXY[Docker Socket Proxy]
+        end
+    end
+
+    %% Connections
+
+    %% External Access
+    EXT --> CF
+    CF --> CF_TUNNEL
+    CF_TUNNEL --> CADDY_EXT
+    CF_TUNNEL --> IMMICH_PROXY
+
+    %% External Service Routing
+    IMMICH_PROXY --> IMMICH
+    CADDY_EXT --> PLAUSIBLE
+
+    %% Internal Access
+    INT --> TAILSCALE
+    TAILSCALE --> CADDY_INT
+
+    %% Internal Service Routing
+    CADDY_INT --> IMMICH
+    CADDY_INT --> PLAUSIBLE
+    CADDY_INT --> PORTAINER
+    CADDY_INT --> BESZEL_HUB
+    CADDY_INT --> POCKET_ID
+    CADDY_INT --> GOTIFY
+    CADDY_INT --> STIRLING
+    CADDY_INT --> MAZANOKE
+    CADDY_INT --> CONVERTX
+    CADDY_INT --> IT_TOOLS
+    CADDY_INT --> SPOTIFY
+
+    %% Service Dependencies
+    BESZEL_HUB --> BESZEL_AGENT
+    PORTAINER --> SOCKET_PROXY
+    DIUN --> SOCKET_PROXY
+    BESZEL_AGENT --> SOCKET_PROXY
+
+    %% Styling
+    classDef external fill:#ffe66d,stroke:#ffc107,stroke-width:2px,color:#000
+    classDef internal fill:#a8e6cf,stroke:#66bb6a,stroke-width:2px,color:#000
+    classDef user-services fill:#42a5f5,stroke:#1976d2,stroke-width:2px,color:#fff
+    classDef infra-services fill:#ba68c8,stroke:#9c27b0,stroke-width:2px,color:#fff
+
+    class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
+    class TAILSCALE,CADDY_INT internal
+    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY user-services
+    class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
+```
