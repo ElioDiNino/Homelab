@@ -78,6 +78,7 @@ services:
     networks:
       - database
       - proxy-internal
+      - proxy-plausible
     labels:
       diun.enable: true
       caddy: "analytics.{$$INTERNAL_DOMAIN}"
@@ -105,4 +106,6 @@ networks:
   database:
     internal: true
   proxy-internal:
+    external: true
+  proxy-plausible:
     external: true
