@@ -99,6 +99,39 @@ services:
       caddy_103: "ha.{$$INTERNAL_DOMAIN}"
       caddy_103.reverse_proxy: "{$$HAOS_HOST}:8123"
 
+  caddy-config-external:
+    image: alpine:latest
+    command: |
+      sh -c "echo \"$$CADDYFILE\" > /mnt/caddy/Caddyfile"
+    volumes:
+      - config-external-setup:/mnt/caddy
+    environment:
+      CADDYFILE: |
+        :80 {
+          handle_path /analytics/* {
+            @plausible path /js/script.js /api/event
+            handle @plausible {
+              rewrite /js/script.js ${PLAUSIBLE_SCRIPT:-/js/script.file-downloads.hash.outbound-links.js}
+              reverse_proxy plausible:8000
+            }
+          }
+        }
+
+  caddy-external:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - caddy-config-external
+    volumes:
+      - data-external:/data
+      - config-external-setup:/etc/caddy
+      - config-external:/config
+    networks:
+      - proxy-external
+      - proxy-plausible
+    labels:
+      diun.enable: true
+
 secrets:
   cloudflare_api_token:
     environment: CLOUDFLARE_API_TOKEN
@@ -106,9 +139,16 @@ secrets:
 volumes:
   data:
   config:
+  data-external:
+  config-external-setup:
+  config-external:
   socket-proxy:
     external: true
 
 networks:
   proxy-internal:
+    external: true
+  proxy-external:
+    external: true
+  proxy-plausible:
     external: true
