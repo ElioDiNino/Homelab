@@ -59,6 +59,8 @@ services:
       - MAXMIND_LICENSE_KEY
       - SMTP_USER_NAME
       - SMTP_USER_PWD
+      - GOOGLE_CLIENT_ID
+      - GOOGLE_CLIENT_SECRET
     environment:
       TMPDIR: /var/lib/plausible/tmp
       # Ref: https://github.com/plausible/community-edition/wiki/configuration
@@ -95,6 +97,10 @@ secrets:
     environment: SMTP_USER_NAME
   SMTP_USER_PWD:
     environment: SMTP_USER_PWD
+  GOOGLE_CLIENT_ID:
+    environment: PLAUSIBLE_GOOGLE_CLIENT_ID
+  GOOGLE_CLIENT_SECRET:
+    environment: PLAUSIBLE_GOOGLE_CLIENT_SECRET
 
 volumes:
   db-data:
