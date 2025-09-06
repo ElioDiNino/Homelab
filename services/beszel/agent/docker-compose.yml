@@ -2,7 +2,6 @@ services:
   beszel-agent:
     image: ghcr.io/henrygd/beszel/beszel-agent:0
     restart: unless-stopped
-    network_mode: host
     volumes:
       - socket-proxy:/socket-proxy:ro
     healthcheck:
