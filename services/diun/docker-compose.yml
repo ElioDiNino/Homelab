@@ -5,7 +5,6 @@ services:
     command: serve
     volumes:
       - data:/data
-      - socket-proxy:/socket-proxy:ro
     secrets:
       - discord_webhook_url
       - gotify_token
@@ -13,7 +12,7 @@ services:
       TZ: ${TIMEZONE:?error}
       DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
       DIUN_PROVIDERS_DOCKER: true
-      DIUN_PROVIDERS_DOCKER_ENDPOINT: unix:///socket-proxy/docker.sock
+      DIUN_PROVIDERS_DOCKER_ENDPOINT: tcp://socket-proxy:2375
       DIUN_DEFAULTS_WATCHREPO: true
       DIUN_DEFAULTS_MAXTAGS: 5
       DIUN_DEFAULTS_SORTTAGS: semver
@@ -21,6 +20,9 @@ services:
       DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
       DIUN_NOTIF_GOTIFY_ENDPOINT: "https://gotify.${INTERNAL_DOMAIN:?error}"
       DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token
+    networks:
+      - outgoing
+      - socket-proxy-diun
     labels:
       diun.enable: true
 
@@ -32,5 +34,8 @@ secrets:
 
 volumes:
   data:
-  socket-proxy:
+
+networks:
+  outgoing:
+  socket-proxy-diun:
     external: true

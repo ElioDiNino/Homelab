@@ -6,7 +6,6 @@ services:
     volumes:
       - data:/data
       - config:/config
-      - socket-proxy:/socket-proxy:ro
     ports:
       - 80:80
       - 443:443
@@ -15,13 +14,14 @@ services:
       - NET_ADMIN
     networks:
       - proxy-internal
+      - socket-proxy-caddy
     secrets:
       - cloudflare_api_token
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
       # Docker Proxy configuration
-      DOCKER_HOST: unix:///socket-proxy/docker.sock
+      DOCKER_HOST: tcp://socket-proxy:2375
       CADDY_INGRESS_NETWORKS: proxy-internal
 
       # Caddyfile variables
@@ -176,11 +176,11 @@ volumes:
   data-external:
   config-external-setup:
   config-external:
-  socket-proxy:
-    external: true
 
 networks:
   proxy-internal:
+    external: true
+  socket-proxy-caddy:
     external: true
   proxy-external:
     external: true
