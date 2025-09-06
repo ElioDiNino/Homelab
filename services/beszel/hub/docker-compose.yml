@@ -15,6 +15,7 @@ services:
       APP_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       SHARE_ALL_SYSTEMS: true
       USER_CREATION: true
+      DISABLE_PASSWORD_AUTH: true
     labels:
       diun.enable: true
       caddy: "beszel.{$$INTERNAL_DOMAIN}"
