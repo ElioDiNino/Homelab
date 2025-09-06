@@ -6,7 +6,9 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: ^\d+\.\d+\.\d+(-\w+)?$
+      diun.notify_on: new
+      diun.sort_tags: reverse
+      diun.include_tags: ^\d{4}\.\d{1,2}\.\d{1,2}(-\w+)?$
       caddy: "tools.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
 
