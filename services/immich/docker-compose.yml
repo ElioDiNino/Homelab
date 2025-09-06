@@ -87,7 +87,7 @@ services:
         }
     networks:
       - frontend
-      - proxy-external
+      - proxy-immich-public
     labels:
       diun.enable: true
       diun.watch_repo: false
@@ -161,5 +161,5 @@ networks:
     internal: true
   proxy-internal:
     external: true
-  proxy-external:
+  proxy-immich-public:
     external: true

@@ -109,14 +109,39 @@ services:
       - config-external-setup:/mnt/caddy
     environment:
       CADDYFILE: |
-        :80 {
+        (default_404) {
+          handle {
+            respond 404
+          }
+        }
+
+        {$$INGEST_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
           handle_path /analytics/* {
             @plausible path /js/script.js /api/event
             handle @plausible {
-              rewrite /js/script.js ${PLAUSIBLE_SCRIPT:-/js/script.file-downloads.hash.outbound-links.js}
+              rewrite /js/script.js {$$PLAUSIBLE_SCRIPT}
               reverse_proxy plausible:8000
             }
+
+            import default_404
           }
+
+          import default_404
+        }
+
+        {$$IMMICH_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+          @external path /share/*
+          handle @external {
+            reverse_proxy immich-public-proxy:3000
+          }
+
+          handle {
+            redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
+          }
+        }
+
+        :80 {
+          import default_404
         }
 
   caddy-external:
@@ -131,6 +156,13 @@ services:
     networks:
       - proxy-external
       - proxy-plausible
+      - proxy-immich-public
+    environment:
+      INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+      EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
+      INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
+      IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
+      PLAUSIBLE_SCRIPT: ${PLAUSIBLE_SCRIPT:-/js/script.file-downloads.hash.outbound-links.js}
     labels:
       diun.enable: true
 
@@ -153,4 +185,6 @@ networks:
   proxy-external:
     external: true
   proxy-plausible:
+    external: true
+  proxy-immich-public:
     external: true
