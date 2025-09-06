@@ -3,6 +3,7 @@ services:
     image: ghcr.io/henrygd/beszel/beszel-agent:0
     restart: always
     volumes:
+      - data:/var/lib/beszel-agent
       - socket-proxy:/socket-proxy:ro
     healthcheck:
       test: ["CMD", "/agent", "health"]
@@ -27,5 +28,6 @@ secrets:
     environment: BESZEL_AGENT_TOKEN
 
 volumes:
+  data:
   socket-proxy:
     external: true

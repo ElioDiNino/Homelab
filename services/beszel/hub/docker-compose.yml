@@ -28,6 +28,7 @@ services:
       beszel:
         condition: service_healthy
     volumes:
+      - data-agent:/var/lib/beszel-agent
       - beszel-socket:/beszel_socket
       - socket-proxy:/socket-proxy:ro
     healthcheck:
@@ -54,6 +55,7 @@ secrets:
 
 volumes:
   data:
+  data-agent:
   beszel-socket:
   socket-proxy:
     external: true
