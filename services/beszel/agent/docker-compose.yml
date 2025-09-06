@@ -20,7 +20,7 @@ services:
       LOG_LEVEL: ${BESZEL_LOG_LEVEL:-info}
     networks:
       - outgoing
-      - socket-proxy-beszel
+      - socket-proxy-beszel-agent
     labels:
       diun.enable: true
 
@@ -35,5 +35,5 @@ volumes:
 
 networks:
   outgoing:
-  socket-proxy-beszel:
+  socket-proxy-beszel-agent:
     external: true
