@@ -4,8 +4,8 @@ services:
   portainer:
     container_name: portainer
     image: portainer/portainer-ee:latest
-    command: -H unix:///var/run/docker.sock
     restart: always
+    command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data:/data
@@ -15,7 +15,8 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
       caddy: "portainer.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 9443 }}"
       caddy.reverse_proxy.import: https

@@ -30,7 +30,8 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: release
+      diun.watch_repo: false
+      diun.include_tags: ^release$
       caddy: "photos.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 2283 }}"
 
@@ -89,7 +90,8 @@ services:
       - proxy-external
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:release
@@ -103,7 +105,8 @@ services:
       - backend
     labels:
       diun.enable: true
-      diun.include_tags: release
+      diun.watch_repo: false
+      diun.include_tags: ^release$
 
   redis:
     image: docker.io/valkey/valkey:8-bookworm@sha256:a137a2b60aca1a75130022d6bb96af423fefae4eb55faf395732db3544803280

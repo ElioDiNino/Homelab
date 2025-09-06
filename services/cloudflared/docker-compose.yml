@@ -15,7 +15,8 @@ services:
       - proxy-external
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
 secrets:
   tunnel_token:

@@ -36,7 +36,8 @@ services:
       SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
   caddy-config:
     image: traefik/whoami:latest
@@ -45,7 +46,8 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
       #### Global Settings ####
       caddy_0.email: "{env.CERTIFICATES_EMAIL}"

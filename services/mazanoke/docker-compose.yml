@@ -6,7 +6,8 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
       caddy: "optimize.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 80 }}"
 
