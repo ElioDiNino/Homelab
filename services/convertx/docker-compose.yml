@@ -1,7 +1,7 @@
 services:
   convertx:
     image: ghcr.io/c4illin/convertx:latest
-    restart: unless-stopped
+    restart: always
     volumes:
       - data:/app/data
     environment:
@@ -13,7 +13,8 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
       caddy: "convert.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 3000 }}"
 

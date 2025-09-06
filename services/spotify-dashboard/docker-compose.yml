@@ -1,7 +1,7 @@
 services:
   server:
     image: ghcr.io/yooooomi/your_spotify_server:latest
-    restart: unless-stopped
+    restart: always
     depends_on:
       - mongo
     environment:
@@ -18,7 +18,8 @@ services:
       - database
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.handle_path: "/api/*"
       caddy.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
@@ -26,7 +27,7 @@ services:
   mongo:
     # Using an older version due to hardware compatibility
     image: mongo:4.4.18
-    restart: unless-stopped
+    restart: always
     volumes:
       - data:/data/db
     networks:
@@ -34,14 +35,15 @@ services:
 
   web:
     image: ghcr.io/yooooomi/your_spotify_client:latest
-    restart: unless-stopped
+    restart: always
     environment:
       API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
     networks:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
       caddy: "sd.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "* {{ upstreams 3000 }}"
 

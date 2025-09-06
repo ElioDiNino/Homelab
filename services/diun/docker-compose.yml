@@ -1,6 +1,7 @@
 services:
   diun:
     image: ghcr.io/crazy-max/diun:4
+    restart: always
     command: serve
     volumes:
       - data:/data
@@ -13,6 +14,8 @@ services:
       DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
       DIUN_PROVIDERS_DOCKER: true
       DIUN_PROVIDERS_DOCKER_ENDPOINT: unix:///socket-proxy/docker.sock
+      DIUN_DEFAULTS_WATCHREPO: true
+      DIUN_DEFAULTS_MAXTAGS: 5
       DIUN_DEFAULTS_SORTTAGS: semver
       DIUN_DEFAULTS_INCLUDETAGS: ^v?\d+$
       DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
@@ -20,7 +23,6 @@ services:
       DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token
     labels:
       diun.enable: true
-    restart: always
 
 secrets:
   discord_webhook_url:

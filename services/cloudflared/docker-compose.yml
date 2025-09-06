@@ -1,7 +1,7 @@
 services:
   cloudflared:
     image: cloudflare/cloudflared:latest
-    restart: unless-stopped
+    restart: always
     command: tunnel run
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -15,7 +15,8 @@ services:
       - proxy-external
     labels:
       diun.enable: true
-      diun.include_tags: latest
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
 secrets:
   tunnel_token:

@@ -1,7 +1,7 @@
 services:
   pocket-id:
     image: ghcr.io/pocket-id/pocket-id:v1
-    restart: unless-stopped
+    restart: always
     volumes:
       - data:/app/data
     healthcheck:
