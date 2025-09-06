@@ -16,25 +16,25 @@ cp .env.example .env
 ### Start services
 
 ```sh
-sudo docker network create proxy-internal
-sudo docker network create proxy-external
-sudo docker network create proxy-plausible --internal
-sudo docker network create proxy-immich-public --internal
-sudo docker compose up -d
+docker network create proxy-internal
+docker network create proxy-external
+docker network create proxy-plausible --internal
+docker network create proxy-immich-public --internal
+docker compose up -d
 ```
 
 ### Stop services
 
 ```sh
-sudo docker compose down
+docker compose down
 ```
 
 ### Update services
 
 ```sh
-sudo docker compose pull
-sudo docker compose up -d
-sudo docker image prune -f
+docker compose pull
+docker compose up -d
+docker image prune -f
 ```
 
 ## Network Diagram
@@ -66,8 +66,6 @@ graph TB
         subgraph "User Services"
             IMMICH[Immich]
             PLAUSIBLE[Plausible]
-            PORTAINER[Portainer]
-            BESZEL_HUB[Beszel Hub]
             POCKET_ID[Pocket ID]
             GOTIFY[Gotify]
             STIRLING[Stirling PDF]
@@ -75,13 +73,17 @@ graph TB
             CONVERTX[ConvertX]
             IT_TOOLS[IT Tools]
             SPOTIFY[Spotify Dashboard]
+            PORTAINER[Portainer]
+            BESZEL_HUB[Beszel Hub]
         end
 
         subgraph "Infrastructure Services"
-            DIUN[Diun]
             BESZEL_AGENT[Beszel Agent]
+            DIUN[Diun]
             SOCKET_PROXY[Docker Socket Proxy]
         end
+
+        DS[Docker Socket]
     end
 
     %% Connections
@@ -103,8 +105,6 @@ graph TB
     %% Internal Service Routing
     CADDY_INT --> IMMICH
     CADDY_INT --> PLAUSIBLE
-    CADDY_INT --> PORTAINER
-    CADDY_INT --> BESZEL_HUB
     CADDY_INT --> POCKET_ID
     CADDY_INT --> GOTIFY
     CADDY_INT --> STIRLING
@@ -112,12 +112,16 @@ graph TB
     CADDY_INT --> CONVERTX
     CADDY_INT --> IT_TOOLS
     CADDY_INT --> SPOTIFY
+    CADDY_INT --> PORTAINER
+    CADDY_INT --> BESZEL_HUB
 
     %% Service Dependencies
     BESZEL_HUB --> BESZEL_AGENT
-    PORTAINER --> SOCKET_PROXY
+    CADDY_INT --> SOCKET_PROXY
     DIUN --> SOCKET_PROXY
     BESZEL_AGENT --> SOCKET_PROXY
+    PORTAINER --> DS
+    SOCKET_PROXY --> DS
 
     %% Styling
     classDef external fill:#ffe66d,stroke:#ffc107,stroke-width:2px,color:#000
@@ -155,7 +159,7 @@ My authentication service of choice is [Pocket ID](https://pocket-id.org/). It i
 
 ### [Docker Socket Proxy](./socket-proxy/)
 
-Due to some services' reliance on connection to the docker socket, I use [Docker Socket Proxy](https://github.com/11notes/docker-socket-proxy) to securely expose the Docker API to my services in read-only mode without giving them direct access to the Docker daemon (with the exception of Portainer, which requires full access).
+Due to some services' reliance on connection to the docker socket, I use [Docker Socket Proxy](https://github.com/wollomatic/socket-proxy) to securely expose the Docker API to my services in read-only mode without giving them direct access to the Docker daemon (with the exception of Portainer, which requires full access).
 
 ### [Immich](./immich/)
 
