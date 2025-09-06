@@ -1,6 +1,6 @@
 services:
   it-tools:
-    image: ghcr.io/sharevb/it-tools:2025.8.6-0325b117
+    image: ghcr.io/sharevb/it-tools:2025.8.31-13b8f041
     restart: unless-stopped
     networks:
       - proxy-internal
