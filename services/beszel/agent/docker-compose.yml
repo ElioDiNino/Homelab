@@ -17,6 +17,7 @@ services:
       HUB_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
       KEY_FILE: /run/secrets/agent_key
       TOKEN_FILE: /run/secrets/agent_token
+      LOG_LEVEL: ${BESZEL_LOG_LEVEL:-info}
     networks:
       - outgoing
       - socket-proxy-beszel

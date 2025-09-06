@@ -15,6 +15,7 @@ services:
       SP_ALLOWFROM: beszel-agent,beszel-local-agent,caddy,diun
       SP_ALLOWHEALTHCHECK: true
       SP_LISTENIP: 0.0.0.0
+      SP_LOGLEVEL: ${SOCKET_PROXY_LOG_LEVEL:-INFO}
       SP_ALLOW_GET: /(v1\..{1,2}/)?(version|info|containers/.*|images/.*|networks(/.*)?|events.*)
       SP_ALLOW_HEAD: /_ping
     networks:
