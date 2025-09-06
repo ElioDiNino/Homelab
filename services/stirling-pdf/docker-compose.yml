@@ -9,7 +9,7 @@ services:
 
   stirling-pdf:
     image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
-    restart: unless-stopped
+    restart: always
     depends_on:
       - volume_instantiation
     volumes:

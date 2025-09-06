@@ -1,7 +1,7 @@
 services:
   beszel:
     image: ghcr.io/henrygd/beszel/beszel:0
-    restart: unless-stopped
+    restart: always
     volumes:
       - data:/beszel_data
       - beszel-socket:/beszel_socket
@@ -23,7 +23,7 @@ services:
 
   beszel-local-agent:
     image: ghcr.io/henrygd/beszel/beszel-agent:0
-    restart: unless-stopped
+    restart: always
     depends_on:
       beszel:
         condition: service_healthy

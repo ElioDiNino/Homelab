@@ -1,6 +1,7 @@
 services:
   diun:
     image: ghcr.io/crazy-max/diun:4
+    restart: always
     command: serve
     volumes:
       - data:/data
@@ -22,7 +23,6 @@ services:
       DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token
     labels:
       diun.enable: true
-    restart: always
 
 secrets:
   discord_webhook_url:

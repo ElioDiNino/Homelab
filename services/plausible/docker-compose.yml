@@ -1,7 +1,7 @@
 services:
   plausible_db:
     image: postgres:16-alpine
-    restart: unless-stopped
+    restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -16,7 +16,7 @@ services:
 
   plausible_events_db:
     image: clickhouse/clickhouse-server:24.12-alpine
-    restart: unless-stopped
+    restart: always
     volumes:
       - event-data:/var/lib/clickhouse
       - event-logs:/var/log/clickhouse-server
@@ -41,7 +41,7 @@ services:
 
   plausible:
     image: ghcr.io/plausible/community-edition:v3
-    restart: unless-stopped
+    restart: always
     command: sh -c "/entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh run"
     depends_on:
       plausible_db:

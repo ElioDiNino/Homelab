@@ -2,7 +2,7 @@ services:
   caddy:
     image: ghcr.io/eliodinino/homelab/caddy:latest
     build: .
-    restart: unless-stopped
+    restart: always
     volumes:
       - data:/data
       - config:/config
@@ -41,7 +41,7 @@ services:
 
   caddy-config:
     image: traefik/whoami:latest
-    restart: unless-stopped
+    restart: always
     networks:
       - proxy-internal
     labels:
@@ -121,7 +121,7 @@ services:
 
   caddy-external:
     image: caddy:2
-    restart: unless-stopped
+    restart: always
     depends_on:
       - caddy-config-external
     volumes:
