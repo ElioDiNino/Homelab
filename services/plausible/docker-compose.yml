@@ -15,7 +15,7 @@ services:
       - database
 
   plausible_events_db:
-    image: clickhouse/clickhouse-server:24.12-alpine
+    image: clickhouse/clickhouse-server:25.8-alpine
     restart: always
     volumes:
       - event-data:/var/lib/clickhouse
