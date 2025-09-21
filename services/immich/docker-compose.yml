@@ -58,6 +58,7 @@ services:
             "singleImageGallery": false,
             "singleItemAutoOpen": true,
             "downloadOriginalPhoto": true,
+            "allowSlugLinks": false,
             "allowDownloadAll": 1,
             "showHomePage": true,
             "showGalleryTitle": true,
