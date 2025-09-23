@@ -10,7 +10,7 @@ services:
       - gotify_token
     environment:
       TZ: ${TIMEZONE:?error}
-      DIUN_WATCH_SCHEDULE: 0 */12 * * * # Every 12 hours
+      DIUN_WATCH_SCHEDULE: 0 7,17 * * * # 7 AM and 5 PM daily
       DIUN_PROVIDERS_DOCKER: true
       DIUN_PROVIDERS_DOCKER_ENDPOINT: tcp://socket-proxy:2375
       DIUN_DEFAULTS_WATCHREPO: true
