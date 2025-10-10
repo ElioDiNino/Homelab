@@ -75,6 +75,7 @@ graph TB
             SPOTIFY[Spotify Dashboard]
             PORTAINER[Portainer]
             BESZEL_HUB[Beszel Hub]
+            TINYAUTH[Tinyauth]
         end
 
         subgraph "Infrastructure Services"
@@ -114,10 +115,12 @@ graph TB
     CADDY_INT --> SPOTIFY
     CADDY_INT --> PORTAINER
     CADDY_INT --> BESZEL_HUB
+    CADDY_INT --> TINYAUTH
 
     %% Service Dependencies
     BESZEL_HUB --> BESZEL_AGENT
     CADDY_INT --> SOCKET_PROXY
+    TINYAUTH --> SOCKET_PROXY
     DIUN --> SOCKET_PROXY
     BESZEL_AGENT --> SOCKET_PROXY
     PORTAINER --> DS
@@ -131,7 +134,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT internal
-    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY user-services
+    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -152,6 +155,10 @@ I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due
 ### [Pocket ID](./pocket-id/)
 
 My authentication service of choice is [Pocket ID](https://pocket-id.org/). It is a self-hosted identity provider that supports OpenID Connect and OAuth 2.0, allowing me to manage user authentication and authorization for my applications securely. I chose it for its simplicity, clean UI, ease of integration, and focus on passwordless authentication.
+
+### [Tinyauth](./tinyauth/)
+
+[Tinyauth](https://tinyauth.app) is an application that enables authentication in front of services that do not natively support it. For my use case specifically, it allows me to use Tinyauth as an authentication proxy for Pocket ID with Caddy. This means I can protect any service behind Caddy with Pocket ID authentication, and even provide OAuth account functionality to some services through user headers, such as Healthchecks.
 
 ### [Diun](./diun/)
 
