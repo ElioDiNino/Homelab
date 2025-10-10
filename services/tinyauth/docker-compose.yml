@@ -1,0 +1,43 @@
+services:
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v3
+    restart: always
+    secrets:
+      - secret
+      - client_secret
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+      APP_URL: https://auth.${INTERNAL_DOMAIN:?error}
+      APP_TITLE: Authentication Proxy
+      SECRET_FILE: /run/secrets/secret
+      SESSION_EXPIRY: ${TINYAUTH_SESSION_EXPIRY:-14400} # 4 hours by default
+      COOKIE_SECURE: true
+      DISABLE_CONTINUE: true
+      GENERIC_NAME: Pocket ID
+      OAUTH_AUTO_REDIRECT: generic
+      GENERIC_CLIENT_ID: ${TINYAUTH_CLIENT_ID:?error}
+      GENERIC_CLIENT_SECRET_FILE: /run/secrets/client_secret
+      GENERIC_AUTH_URL: https://id.${INTERNAL_DOMAIN:?error}/authorize
+      GENERIC_TOKEN_URL: https://id.${INTERNAL_DOMAIN:?error}/api/oidc/token
+      GENERIC_USER_URL: https://id.${INTERNAL_DOMAIN:?error}/api/oidc/userinfo
+      GENERIC_SCOPES: openid email profile groups
+      LOG_LEVEL: ${TINYAUTH_LOG_LEVEL:-1}
+    networks:
+      - proxy-internal
+      - socket-proxy-tinyauth
+    labels:
+      diun.enable: true
+      caddy: "auth.{$$INTERNAL_DOMAIN}"
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+secrets:
+  secret:
+    environment: TINYAUTH_SECRET
+  client_secret:
+    environment: TINYAUTH_CLIENT_SECRET
+
+networks:
+  proxy-internal:
+    external: true
+  socket-proxy-tinyauth:
+    external: true
