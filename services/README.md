@@ -147,7 +147,7 @@ I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due
 
 ### [Beszel](./beszel/)
 
-[Beszel](https://beszel.dev/) is a lightweight server monitoring platform that includes Docker statistics, historical data, and alert functions. I use it as the main monitoring tool for my homelab, providing insights into the performance and health of my services.
+[Beszel](https://beszel.dev/) is a lightweight server monitoring platform that includes Docker statistics, historical data, and alert functions. I use it as the main monitoring tool for my homelab, providing insights into the performance and health of my machines.
 
 ### [Pocket ID](./pocket-id/)
 

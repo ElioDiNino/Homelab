@@ -1,6 +1,6 @@
 # Homelab
 
-This repository serves as the source of truth for my homelab. It includes an architectural overview along with the configurations for my [self-hosted services](./services/) and [accompanying tools](./tools). See the [overview](#overview) below and the documentation in each directory for more information.
+This repository serves as the source of truth for my homelab. It includes an architectural overview along with the [configurations for my self-hosted services](./services/) and [accompanying tools](./tools). See the [overview](#overview) below and the documentation in each directory for more information.
 
 ## Landing Page ([internal.eliodinino.com](https://internal.eliodinino.com))
 
@@ -14,7 +14,11 @@ Below is a high-level overview of my homelab setup, including the hardware and s
 
 ### Tailscale
 
-I use [Tailscale](https://tailscale.com/) to create a secure mesh VPN between my devices. This allows me to access my homelab services from anywhere without exposing them to the public internet as well as easily ssh into my devices. Tailscale is easy to set up and provides a secure connection without the need for complex firewall rules or port forwarding. I also leverage Tailscale's private IP addresses to proxy requests to my services on my internal subdomain (`internal.eliodinino.com`) such that I get nice service domains without exposing anything publicly (other than a single Tailscale IP address, which is not sensitive).
+I use [Tailscale](https://tailscale.com/) to create a secure mesh VPN between my devices. This allows me to access my homelab services from anywhere without exposing them to the public internet and it enables zero-config ssh access into my devices. Tailscale is easy to set up and provides a secure connection without the need for complex firewall rules or port forwarding. I also leverage Tailscale's private IP addresses to proxy requests to my services on my internal subdomain (`internal.eliodinino.com`) such that I get nice service domains without exposing anything publicly (other than a single Tailscale IP address, which is not sensitive).
+
+### Cloudflare
+
+In addition to using [Cloudflare](https://www.cloudflare.com/) for DNS and web protection, I use [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) to publicly expose a few of my services in a secure manner. More details can be found [here](./services/README.md).
 
 ### NAS with Proxmox
 
@@ -30,7 +34,7 @@ I run [Home Assistant OS](https://home-assistant.io/) on a separate VM ([communi
 
 #### HexOS
 
-[HexOS](https://hexos.com/) is a NAS operating system that is built on top of [TrueNAS Scale](https://www.truenas.com/truenas-scale/). It is designed to be extremely easy to use and provides a clean interface for managing my storage needs. I run HexOS on a separate VM within Proxmox and use it to manage my storage pools and shares which hook into my VMs and containers. I also use the TrueNAS Scale [Tailscale app](https://www.truenas.com/apps/) to connect HexOS to Tailscale.
+[HexOS](https://hexos.com/) is a NAS operating system that is built on top of [TrueNAS Scale](https://www.truenas.com/truenas-scale/). It is designed to be extremely easy to use and provides a clean interface for managing my storage needs. I run HexOS on a separate VM within Proxmox and use it to manage my storage pools and shares which hook into my VMs and containers. I also use the TrueNAS Scale [Tailscale app](https://apps.truenas.com/catalog/tailscale/) to connect HexOS to Tailscale.
 
 ### ODROID with Ubuntu
 
