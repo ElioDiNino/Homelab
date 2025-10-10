@@ -17,6 +17,8 @@ services:
       DIUN_DEFAULTS_MAXTAGS: 5
       DIUN_DEFAULTS_SORTTAGS: semver
       DIUN_DEFAULTS_INCLUDETAGS: ^v?\d+$
+      DIUN_WATCH_HEALTHCHECKS_BASEURL: https://healthchecks.${INTERNAL_DOMAIN:?error}/ping
+      DIUN_WATCH_HEALTHCHECKS_UUID: ${DIUN_HEALTHCHECKS_UUID:?error}
       DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
       DIUN_NOTIF_GOTIFY_ENDPOINT: "https://gotify.${INTERNAL_DOMAIN:?error}"
       DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token

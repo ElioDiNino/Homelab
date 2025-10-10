@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:16
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      start_period: 1m
+    secrets:
+      - db-name
+      - db-username
+      - db-password
+    environment:
+      POSTGRES_DB_FILE: /run/secrets/db-name
+      POSTGRES_USER_FILE: /run/secrets/db-username
+      POSTGRES_PASSWORD_FILE: /run/secrets/db-password
+    networks:
+      - database
+
+  web:
+    image: healthchecks/healthchecks:latest
+    restart: always
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uwsgi /opt/healthchecks/docker/uwsgi.ini'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ADMINS: ${HEALTHCHECKS_ADMIN_EMAIL:?error}
+      APPRISE_ENABLED: "True"
+      DB: postgres
+      DB_HOST: db
+      DB_NAME: ${HEALTHCHECKS_DB_DATABASE_NAME:?error}
+      DB_PASSWORD: ${HEALTHCHECKS_DB_PASSWORD:?error}
+      DB_PORT: 5432
+      DB_SSLMODE: prefer
+      DB_TARGET_SESSION_ATTRS: read-write
+      DB_USER: ${HEALTHCHECKS_DB_USERNAME:?error}
+      DEBUG: "False"
+      DEFAULT_FROM_EMAIL: ${SMTP_EMAIL:?error}
+      EMAIL_HOST: ${SMTP_HOST_ADDR:?error}
+      EMAIL_HOST_PASSWORD: ${SMTP_USER_PWD:?error}
+      EMAIL_HOST_USER: ${SMTP_USER_NAME:?error}
+      EMAIL_PORT: ${SMTP_HOST_PORT:?error}
+      EMAIL_USE_SSL: ${HEALTHCHECKS_SMTP_HOST_SSL_ENABLED:?error}
+      EMAIL_USE_TLS: ${HEALTHCHECKS_SMTP_HOST_TLS_ENABLED:?error}
+      EMAIL_USE_VERIFICATION: "True"
+      PING_BODY_LIMIT: 10000
+      PING_EMAIL_DOMAIN: disabled
+      REGISTRATION_OPEN: "False"
+      REMOTE_USER_HEADER: HTTP_REMOTE_EMAIL
+      SECRET_KEY: ${HEALTHCHECKS_SECRET_KEY:?error}
+      SECURE_PROXY_SSL_HEADER: HTTP_X_FORWARDED_PROTO,https
+      SHELL_ENABLED: "True"
+      SITE_LOGO_URL: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/healthchecks.png
+      SITE_NAME: Healthchecks
+      SITE_ROOT: https://healthchecks.${INTERNAL_DOMAIN:?error}
+      USE_PAYMENTS: "False"
+    networks:
+      - database
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
+      caddy: "healthchecks.{$$INTERNAL_DOMAIN}"
+      caddy.import: tinyauth
+      caddy.reverse_proxy: "{{ upstreams 8000 }}"
+      tinyauth.apps.healthchecks.config.domain: healthchecks.${INTERNAL_DOMAIN:?error}
+      tinyauth.apps.healthchecks.oauth.groups: admins
+      tinyauth.apps.healthchecks.path.allow: ^/ping/
+
+secrets:
+  db-name:
+    environment: HEALTHCHECKS_DB_DATABASE_NAME
+  db-username:
+    environment: HEALTHCHECKS_DB_USERNAME
+  db-password:
+    environment: HEALTHCHECKS_DB_PASSWORD
+
+volumes:
+  db-data:
+
+networks:
+  database:
+    internal: true
+  proxy-internal:
+    external: true
