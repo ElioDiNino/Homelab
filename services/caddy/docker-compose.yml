@@ -72,6 +72,12 @@ services:
       caddy_2.transport.tls: ""
       caddy_2.transport.tls_insecure_skip_verify: ""
 
+      # Authentication proxy via Tinyauth
+      caddy_3: (tinyauth)
+      caddy_3.forward_auth: tinyauth:3000
+      caddy_3.forward_auth.uri: /api/auth/caddy
+      caddy_3.forward_auth.copy_headers: Remote-User Remote-Name Remote-Email Remote-Groups
+
       #### Wildcard Definitions ####
       caddy_10: "*.{$$INTERNAL_DOMAIN}"
       caddy_10.import: wildcard
@@ -81,7 +87,10 @@ services:
       # This debugging container
       # https://github.com/traefik/whoami
       caddy_99: whoami.{$$INTERNAL_DOMAIN}
+      caddy_99.import: tinyauth
       caddy_99.reverse_proxy: "{{ upstreams 80 }}"
+      tinyauth.domain: whoami.${INTERNAL_DOMAIN:?error}
+      tinyauth.oauth.groups: admins
 
       # Internal access check
       caddy_100: "ping.{$$INTERNAL_DOMAIN}"
