@@ -13,6 +13,8 @@
     "Immich",
     "mazanoke",
     "ODROID",
-    "passwordless"
+    "passwordless",
+    "pocketid",
+    "tinyauth"
   ]
 }

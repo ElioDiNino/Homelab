@@ -89,8 +89,8 @@ services:
       caddy_99: whoami.{$$INTERNAL_DOMAIN}
       caddy_99.import: tinyauth
       caddy_99.reverse_proxy: "{{ upstreams 80 }}"
-      tinyauth.domain: whoami.${INTERNAL_DOMAIN:?error}
-      tinyauth.oauth.groups: admins
+      tinyauth.apps.whoami.config.domain: whoami.${INTERNAL_DOMAIN:?error}
+      tinyauth.apps.whoami.oauth.groups: admins
 
       # Internal access check
       caddy_100: "ping.{$$INTERNAL_DOMAIN}"
