@@ -1,0 +1,23 @@
+services:
+  uptime-kuma:
+    image: ghcr.io/louislam/uptime-kuma:beta
+    restart: always
+    volumes:
+      - data:/app/data
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      caddy: "status.{$$INTERNAL_DOMAIN}"
+      caddy.import: tinyauth
+      caddy.reverse_proxy: "{{upstreams 3001}}"
+      tinyauth.apps.uptime-kuma.config.domain: status.${INTERNAL_DOMAIN:?error}
+      tinyauth.apps.uptime-kuma.oauth.groups: admins
+      tinyauth.apps.uptime-kuma.path.allow: ^/(status/|assets/|upload/|icon.svg|api/(push/|badge/|status-page/heartbeat/))
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true

@@ -68,6 +68,8 @@ graph TB
             PLAUSIBLE[Plausible]
             POCKET_ID[Pocket ID]
             GOTIFY[Gotify]
+            HEALTHCHECKS[Healthchecks]
+            UPTIME_KUMA[Uptime Kuma]
             STIRLING[Stirling PDF]
             MAZANOKE[Mazanoke]
             CONVERTX[ConvertX]
@@ -108,6 +110,8 @@ graph TB
     CADDY_INT --> PLAUSIBLE
     CADDY_INT --> POCKET_ID
     CADDY_INT --> GOTIFY
+    CADDY_INT --> HEALTHCHECKS
+    CADDY_INT --> UPTIME_KUMA
     CADDY_INT --> STIRLING
     CADDY_INT --> MAZANOKE
     CADDY_INT --> CONVERTX
@@ -134,7 +138,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT internal
-    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -158,11 +162,19 @@ My authentication service of choice is [Pocket ID](https://pocket-id.org/). It i
 
 ### [Tinyauth](./tinyauth/)
 
-[Tinyauth](https://tinyauth.app) is an application that enables authentication in front of services that do not natively support it. For my use case specifically, it allows me to use Tinyauth as an authentication proxy for Pocket ID with Caddy. This means I can protect any service behind Caddy with Pocket ID authentication, and even provide OAuth account functionality to some services through user headers, such as Healthchecks.
+[Tinyauth](https://tinyauth.app) is an application that enables authentication in front of services that do not natively support it. For my use case specifically, it allows me to use Tinyauth as an authentication proxy for Pocket ID with Caddy. This means I can protect any service behind Caddy with Pocket ID authentication, and even provide OAuth account functionality to some services through user headers, such as [Healthchecks](#healthchecks).
 
 ### [Diun](./diun/)
 
 [Docker Image Update Notifier (Diun)](https://crazymax.dev/diun/) is an application for receiving notifications when a Docker image is updated on a Docker registry. I use it to monitor my important containers and notify me via 3rd-party integrations when a new image version is found.
+
+### [Uptime Kuma](./uptime-kuma/)
+
+To monitor the uptime of my services, I use [Uptime Kuma](https://github.com/louislam/uptime-kuma). It is a feature-rich monitoring tool that supports various check types, has many notification options, and has a status page builder.
+
+### [Healthchecks](./healthchecks/)
+
+[Healthchecks](https://healthchecks.io/) is a cron job and background task monitoring service. It allows you to create "check-ins" for your scheduled tasks, and if a task fails to check in within a specified time frame, it sends you an alert via email or other notification methods. I use it to monitor various scheduled tasks and ensure they are running as expected.
 
 ### [Docker Socket Proxy](./socket-proxy/)
 
