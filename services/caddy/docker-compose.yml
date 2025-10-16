@@ -78,9 +78,20 @@ services:
       caddy_3.forward_auth.uri: /api/auth/caddy
       caddy_3.forward_auth.copy_headers: Remote-User Remote-Name Remote-Email Remote-Groups
 
+      # Default 404 handler
+      caddy_4: (default_404)
+      caddy_4.handle.respond: 404
+
       #### Wildcard Definitions ####
+
+      # Subdomains
       caddy_10: "*.{$$INTERNAL_DOMAIN}"
-      caddy_10.import: wildcard
+      caddy_10.0_import: wildcard
+      caddy_10.1_import: default_404
+
+      # Direct access to IP (no domain)
+      caddy_20: ":80"
+      caddy_20.import: default_404
 
       #### Static Definitions ####
 
