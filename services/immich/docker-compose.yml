@@ -1,6 +1,6 @@
 services:
   immich-server:
-    image: ghcr.io/immich-app/immich-server:release
+    image: ghcr.io/immich-app/immich-server:v2
     restart: always
     depends_on:
       - redis
@@ -30,8 +30,6 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.watch_repo: false
-      diun.include_tags: ^release$
       caddy: "photos.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 2283 }}"
 
@@ -95,7 +93,7 @@ services:
       diun.include_tags: ^latest$
 
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:v2
     restart: always
     volumes:
       - model-cache:/cache
@@ -106,11 +104,9 @@ services:
       - backend
     labels:
       diun.enable: true
-      diun.watch_repo: false
-      diun.include_tags: ^release$
 
   redis:
-    image: docker.io/valkey/valkey:8-bookworm@sha256:fea8b3e67b15729d4bb70589eb03367bab9ad1ee89c876f54327fc7c6e618571
+    image: docker.io/valkey/valkey:8@sha256:81db6d39e1bba3b3ff32bd3a1b19a6d69690f94a3954ec131277b9a26b95b3aa
     restart: always
     healthcheck:
       test: valkey-cli ping || exit 1
@@ -120,7 +116,7 @@ services:
       - backend
 
   database:
-    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:41eacbe83eca995561fe43814fd4891e16e39632806253848efaf04d3c8a8b84
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
