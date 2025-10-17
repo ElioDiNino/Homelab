@@ -8,7 +8,7 @@ services:
       - data:/srv/stirling-pdf
 
   stirling-pdf:
-    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest-fat
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
     restart: always
     depends_on:
       - volume_instantiation
@@ -41,7 +41,6 @@ services:
     environment:
       # Ref: https://docs.stirlingpdf.com/Advanced%20Configuration/How%20to%20add%20configurations
       LANGS: enUS,en_GB
-      SYSTEM_SHOWUPDATE: true
       SYSTEM_ENABLEANALYTICS: false
       SYSTEM_FILEUPLOADLIMIT: 200MB
       UI_APPNAME: PDF Tools
