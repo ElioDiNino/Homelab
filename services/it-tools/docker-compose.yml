@@ -1,6 +1,6 @@
 services:
   it-tools:
-    image: ghcr.io/sharevb/it-tools:2025.10.12
+    image: ghcr.io/sharevb/it-tools:2025.10.19
     restart: always
     networks:
       - proxy-internal
