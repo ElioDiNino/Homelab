@@ -4,6 +4,7 @@ services:
     restart: always
     volumes:
       - data:/data
+      - /etc/localtime:/etc/localtime:ro
     secrets:
       - client_secret
     environment:
