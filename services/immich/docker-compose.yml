@@ -53,11 +53,12 @@ services:
               "Cache-Control": "public, max-age=2592000",
               "Access-Control-Allow-Origin":  "*"
             },
-            "singleImageGallery": false,
+            "singleImageGallery": true,
             "singleItemAutoOpen": true,
             "downloadOriginalPhoto": true,
-            "allowSlugLinks": false,
+            "downloadedFilename": 2,
             "allowDownloadAll": 1,
+            "allowSlugLinks": false,
             "showHomePage": true,
             "showGalleryTitle": true,
             "showMetadata": {
