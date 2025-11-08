@@ -105,6 +105,10 @@ services:
       - backend
     labels:
       diun.enable: true
+    deploy:
+      resources:
+        limits:
+          memory: ${IMMICH_ML_MEMORY_LIMIT:?error}
 
   redis:
     image: docker.io/valkey/valkey:8@sha256:81db6d39e1bba3b3ff32bd3a1b19a6d69690f94a3954ec131277b9a26b95b3aa
