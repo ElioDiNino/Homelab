@@ -137,7 +137,7 @@ services:
 
         {$$INGEST_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
           handle_path /analytics/* {
-            @plausible path /js/script.js /api/event
+            @plausible path /js/script.js /js/pa-*.js /api/event
             handle @plausible {
               rewrite /js/script.js {$$PLAUSIBLE_SCRIPT}
               reverse_proxy plausible:8000
