@@ -25,13 +25,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    secrets:
+      - db-password
+      - email-password
+      - secret-key
     environment:
       ADMINS: ${HEALTHCHECKS_ADMIN_EMAIL:?error}
       APPRISE_ENABLED: "True"
       DB: postgres
       DB_HOST: db
       DB_NAME: ${HEALTHCHECKS_DB_DATABASE_NAME:?error}
-      DB_PASSWORD: ${HEALTHCHECKS_DB_PASSWORD:?error}
+      DB_PASSWORD_FILE: /run/secrets/db-password
       DB_PORT: 5432
       DB_SSLMODE: prefer
       DB_TARGET_SESSION_ATTRS: read-write
@@ -39,7 +43,7 @@ services:
       DEBUG: "False"
       DEFAULT_FROM_EMAIL: ${SMTP_EMAIL:?error}
       EMAIL_HOST: ${SMTP_HOST_ADDR:?error}
-      EMAIL_HOST_PASSWORD: ${SMTP_USER_PWD:?error}
+      EMAIL_HOST_PASSWORD_FILE: /run/secrets/email-password
       EMAIL_HOST_USER: ${SMTP_USER_NAME:?error}
       EMAIL_PORT: ${SMTP_HOST_PORT:?error}
       EMAIL_USE_SSL: ${HEALTHCHECKS_SMTP_HOST_SSL_ENABLED:?error}
@@ -49,7 +53,7 @@ services:
       PING_EMAIL_DOMAIN: disabled
       REGISTRATION_OPEN: "False"
       REMOTE_USER_HEADER: HTTP_REMOTE_EMAIL
-      SECRET_KEY: ${HEALTHCHECKS_SECRET_KEY:?error}
+      SECRET_KEY_FILE: /run/secrets/secret-key
       SECURE_PROXY_SSL_HEADER: HTTP_X_FORWARDED_PROTO,https
       SHELL_ENABLED: "True"
       SITE_LOGO_URL: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/healthchecks.png
@@ -77,6 +81,10 @@ secrets:
     environment: HEALTHCHECKS_DB_USERNAME
   db-password:
     environment: HEALTHCHECKS_DB_PASSWORD
+  email-password:
+    environment: SMTP_USER_PWD
+  secret-key:
+    environment: HEALTHCHECKS_SECRET_KEY
 
 volumes:
   db-data:
