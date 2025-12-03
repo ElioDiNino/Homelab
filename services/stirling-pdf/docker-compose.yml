@@ -8,7 +8,7 @@ services:
       - data:/srv/stirling-pdf
 
   stirling-pdf:
-    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    image: ghcr.io/stirling-tools/stirling-pdf:latest
     restart: always
     depends_on:
       - volume_instantiation
@@ -39,12 +39,11 @@ services:
         volume:
           subpath: trainingData
     environment:
-      # Ref: https://docs.stirlingpdf.com/Advanced%20Configuration/How%20to%20add%20configurations
-      LANGS: enUS,en_GB
+      # Ref: https://docs.stirlingpdf.com/Configuration
+      LANGS: en_US,en_GB
       SYSTEM_ENABLEANALYTICS: false
-      SYSTEM_FILEUPLOADLIMIT: 200MB
-      UI_APPNAME: PDF Tools
-      UI_HOMEDESCRIPTION: A locally hosted one-stop shop for all your PDF needs.
+      SYSTEM_MAXFILESIZE: 200MB
+      UI_LOGOSTYLE: modern
       UI_APPNAMENAVBAR: PDF Tools
       SHOW_SURVEY: false
     networks:
@@ -57,8 +56,8 @@ services:
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
       caddy.header.Content-Security-Policy: >
         "
-        default-src 'self' blob: data: 'unsafe-inline';
-        connect-src 'self' blob: https://api.github.com https://raw.githubusercontent.com https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
+        default-src 'self' blob: data: 'unsafe-inline' 'unsafe-eval';
+        connect-src 'self' blob: https://api.iconify.design https://cdn.jsdelivr.net https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
         report-uri {$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT};
         report-to csp-endpoint;
         "
