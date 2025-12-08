@@ -1,14 +1,13 @@
 services:
   it-tools:
-    image: ghcr.io/sharevb/it-tools:2025.10.19
+    image: ghcr.io/sharevb/it-tools:stable
     restart: always
     networks:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.notify_on: new
-      diun.sort_tags: reverse
-      diun.include_tags: ^\d{4}\.\d{1,2}\.\d{1,2}(-\w+)?$
+      diun.watch_repo: false
+      diun.include_tags: ^stable$
       caddy: "tools.{$$INTERNAL_DOMAIN}"
       caddy.reverse_proxy: "{{ upstreams 8080 }}"
 
