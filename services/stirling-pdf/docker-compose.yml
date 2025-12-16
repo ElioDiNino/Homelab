@@ -42,6 +42,7 @@ services:
       # Ref: https://docs.stirlingpdf.com/Configuration
       LANGS: en_US,en_GB
       SYSTEM_ENABLEANALYTICS: false
+      SYSTEM_ENABLEDESKTOPINSTALLSLIDE: false
       SYSTEM_MAXFILESIZE: 200MB
       UI_LOGOSTYLE: modern
       UI_APPNAMENAVBAR: PDF Tools
