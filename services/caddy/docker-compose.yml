@@ -121,56 +121,14 @@ services:
       caddy_103: "ha.{$$INTERNAL_DOMAIN}"
       caddy_103.reverse_proxy: "{$$HAOS_HOST}:8123"
 
-  caddy-config-external:
-    image: alpine:latest
-    command: |
-      sh -c "echo \"$$CADDYFILE\" > /mnt/caddy/Caddyfile"
-    volumes:
-      - config-external-setup:/mnt/caddy
-    environment:
-      CADDYFILE: |
-        (default_404) {
-          handle {
-            respond 404
-          }
-        }
-
-        {$$INGEST_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-          handle_path /analytics/* {
-            @plausible path /js/pa-*.js /api/event
-            handle @plausible {
-              reverse_proxy plausible:8000
-            }
-
-            import default_404
-          }
-
-          import default_404
-        }
-
-        {$$IMMICH_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-          @external path /share/*
-          handle @external {
-            reverse_proxy immich-public-proxy:3000
-          }
-
-          handle {
-            redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
-          }
-        }
-
-        :80 {
-          import default_404
-        }
-
   caddy-external:
     image: caddy:2
     restart: always
-    depends_on:
-      - caddy-config-external
+    configs:
+      - source: external_caddyfile
+        target: /etc/caddy/Caddyfile
     volumes:
       - data-external:/data
-      - config-external-setup:/etc/caddy
       - config-external:/config
     networks:
       - proxy-external
@@ -184,6 +142,43 @@ services:
     labels:
       diun.enable: true
 
+configs:
+  external_caddyfile:
+    content: |
+      (default_404) {
+        handle {
+          respond 404
+        }
+      }
+
+      {$$INGEST_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+        handle_path /analytics/* {
+          @plausible path /js/pa-*.js /api/event
+          handle @plausible {
+            reverse_proxy plausible:8000
+          }
+
+          import default_404
+        }
+
+        import default_404
+      }
+
+      {$$IMMICH_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+        @external path /share/*
+        handle @external {
+          reverse_proxy immich-public-proxy:3000
+        }
+
+        handle {
+          redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
+        }
+      }
+
+      :80 {
+        import default_404
+      }
+
 secrets:
   cloudflare_api_token:
     environment: CLOUDFLARE_API_TOKEN
@@ -192,7 +187,6 @@ volumes:
   data:
   config:
   data-external:
-  config-external-setup:
   config-external:
 
 networks:
