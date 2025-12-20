@@ -17,9 +17,10 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
-      caddy: "portainer.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 9443 }}"
-      caddy.reverse_proxy.import: https
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy portainer
+      caddy.import.reverse_proxy: "{{ upstreams 9443 }}"
+      caddy.import.reverse_proxy.import: https
 
 volumes:
   data:

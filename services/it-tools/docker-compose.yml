@@ -8,8 +8,9 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^stable$
-      caddy: "tools.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 8080 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy tools
+      caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
 
 networks:
   proxy-internal:

@@ -53,16 +53,17 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest-fat$
-      caddy: "pdf.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 8080 }}"
-      caddy.header.Content-Security-Policy: >
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy pdf
+      caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
+      caddy.import.header.Content-Security-Policy: >
         "
         default-src 'self' blob: data: 'unsafe-inline' 'unsafe-eval';
         connect-src 'self' blob: https://api.iconify.design https://cdn.jsdelivr.net https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
         report-uri {$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT};
         report-to csp-endpoint;
         "
-      caddy.header.Reporting-Endpoints: csp-endpoint="{$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT}"
+      caddy.import.header.Reporting-Endpoints: csp-endpoint="{$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT}"
 
 volumes:
   data:

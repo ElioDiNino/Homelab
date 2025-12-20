@@ -20,9 +20,10 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
-      caddy: "sd.{$$INTERNAL_DOMAIN}"
-      caddy.handle_path: "/api/*"
-      caddy.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy sd
+      caddy.import.handle_path: "/api/*"
+      caddy.import.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
 
   mongo:
     # Using an older version due to hardware compatibility
@@ -44,8 +45,9 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
-      caddy: "sd.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "* {{ upstreams 3000 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy sd
+      caddy.import.reverse_proxy: "* {{ upstreams 3000 }}"
 
 volumes:
   data:

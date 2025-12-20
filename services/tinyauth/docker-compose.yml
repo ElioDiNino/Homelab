@@ -27,8 +27,9 @@ services:
       - socket-proxy-tinyauth
     labels:
       diun.enable: true
-      caddy: "auth.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy auth
+      caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
 
 secrets:
   client_secret:

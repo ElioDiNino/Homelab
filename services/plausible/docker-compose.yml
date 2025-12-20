@@ -83,8 +83,9 @@ services:
       - proxy-plausible
     labels:
       diun.enable: true
-      caddy: "analytics.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 8000 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy analytics
+      caddy.import.reverse_proxy: "{{ upstreams 8000 }}"
 
 secrets:
   db-password:

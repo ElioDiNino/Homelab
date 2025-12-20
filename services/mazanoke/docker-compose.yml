@@ -8,8 +8,9 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
-      caddy: "optimize.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 80 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy optimize
+      caddy.import.reverse_proxy: "{{ upstreams 80 }}"
 
 networks:
   proxy-internal:

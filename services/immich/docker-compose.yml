@@ -30,8 +30,9 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      caddy: "photos.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 2283 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy photos
+      caddy.import.reverse_proxy: "{{ upstreams 2283 }}"
 
   immich-public-proxy:
     image: ghcr.io/alangrainger/immich-public-proxy:latest

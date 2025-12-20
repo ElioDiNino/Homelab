@@ -8,9 +8,10 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      caddy: "status.{$$INTERNAL_DOMAIN}"
-      caddy.import: tinyauth
-      caddy.reverse_proxy: "{{upstreams 3001}}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy status
+      caddy.import.import: tinyauth
+      caddy.import.reverse_proxy: "{{ upstreams 3001 }}"
       tinyauth.apps.uptime-kuma.config.domain: status.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.uptime-kuma.oauth.groups: admins
       tinyauth.apps.uptime-kuma.path.allow: ^/(status/|assets/|upload/|icon.svg|api/(push/|badge/|status-page/heartbeat/))
