@@ -67,9 +67,10 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
-      caddy: "healthchecks.{$$INTERNAL_DOMAIN}"
-      caddy.import: tinyauth
-      caddy.reverse_proxy: "{{ upstreams 8000 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy healthchecks
+      caddy.import.import: tinyauth
+      caddy.import.reverse_proxy: "{{ upstreams 8000 }}"
       tinyauth.apps.healthchecks.config.domain: healthchecks.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.healthchecks.oauth.groups: admins
       tinyauth.apps.healthchecks.path.allow: ^/(ping/|api/v3/status/$)

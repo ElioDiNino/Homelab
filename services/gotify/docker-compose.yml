@@ -10,8 +10,9 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      caddy: "gotify.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 80 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy gotify
+      caddy.import.reverse_proxy: "{{ upstreams 80 }}"
 
 volumes:
   data:

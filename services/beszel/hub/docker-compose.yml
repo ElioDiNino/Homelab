@@ -18,8 +18,9 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      caddy: "beszel.{$$INTERNAL_DOMAIN}"
-      caddy.reverse_proxy: "{{ upstreams 8090 }}"
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy beszel
+      caddy.import.reverse_proxy: "{{ upstreams 8090 }}"
 
   beszel-local-agent:
     image: ghcr.io/henrygd/beszel/beszel-agent:0
