@@ -23,12 +23,14 @@ services:
       # Docker Proxy configuration
       DOCKER_HOST: tcp://socket-proxy:2375
       CADDY_INGRESS_NETWORKS: proxy-internal
+      CADDY_DOCKER_SCAN_STOPPED_CONTAINERS: true # Return 502 instead of 404 for stopped services
 
       # Caddyfile variables
       CLOUDFLARE_API_TOKEN_FILE: /run/secrets/cloudflare_api_token
       ENVIRONMENT: ${ENVIRONMENT:?error}
       CERTIFICATES_EMAIL: ${CERTIFICATES_EMAIL:?error}
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+      WILDCARD_INTERNAL: "*.${INTERNAL_DOMAIN:?error}"
       DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
       HEXOS_HOST: ${HEXOS_HOST:?error}
@@ -38,6 +40,21 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+
+  error-pages:
+    image: ghcr.io/tarampampam/error-pages:3
+    restart: always
+    networks:
+      - proxy-internal
+    healthcheck:
+      test: ["CMD", "/bin/error-pages", "healthcheck"]
+      start_period: 5s
+      interval: 120s
+    environment:
+      TEMPLATE_NAME: connection
+      SEND_SAME_HTTP_CODE: true
+    labels:
+      diun.enable: true
 
   caddy-config:
     image: traefik/whoami:latest
@@ -78,48 +95,63 @@ services:
       caddy_3.forward_auth.uri: /api/auth/caddy
       caddy_3.forward_auth.copy_headers: Remote-User Remote-Name Remote-Email Remote-Groups
 
-      # Default 404 handler
-      caddy_4: (default_404)
-      caddy_4.handle.respond: 404
+      # Pretty error pages
+      caddy_4: (error_pages)
+      caddy_4.handle_errors: ""
+      caddy_4.handle_errors.reverse_proxy: "error-pages:8080"
+      caddy_4.handle_errors.reverse_proxy.header_up: X-Code {err.status_code}
+
+      # Default 404 response
+      caddy_5: (default_404)
+      caddy_5.error: 404
+      caddy_5.import: error_pages
+
+      # Service proxy template
+      # Arg: subdomain
+      # Block: response directives and other customizations
+      caddy_6: (service_proxy)
+      caddy_6.@{args[0]}: host {args[0]}.{$$INTERNAL_DOMAIN}
+      caddy_6.handle: "@{args[0]}"
+      caddy_6.handle.{block}: ""
 
       #### Wildcard Definitions ####
 
-      # Subdomains
-      caddy_10: "*.{$$INTERNAL_DOMAIN}"
-      caddy_10.0_import: wildcard
-      caddy_10.1_import: default_404
-
       # Direct access to IP (no domain)
-      caddy_20: ":80"
-      caddy_20.import: default_404
+      caddy_10: ":80"
+      caddy_10.import: default_404
+
+      # Service subdomains
+      caddy_20: "{$$WILDCARD_INTERNAL}"
+      caddy_20.0_import: wildcard
+      caddy_20.1_import: default_404
 
       #### Static Definitions ####
 
       # This debugging container
       # https://github.com/traefik/whoami
-      caddy_99: whoami.{$$INTERNAL_DOMAIN}
-      caddy_99.import: tinyauth
-      caddy_99.reverse_proxy: "{{ upstreams 80 }}"
+      caddy_20.2_import: service_proxy whoami
+      caddy_20.2_import.import: tinyauth
+      caddy_20.2_import.reverse_proxy: "{{ upstreams 80 }}"
       tinyauth.apps.whoami.config.domain: whoami.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.whoami.oauth.groups: admins
 
       # Internal access check
-      caddy_100: "ping.{$$INTERNAL_DOMAIN}"
-      caddy_100.header.Access-Control-Allow-Origin: "*"
-      caddy_100.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
+      caddy_20.3_import: service_proxy ping
+      caddy_20.3_import.header.Access-Control-Allow-Origin: "*"
+      caddy_20.3_import.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
 
       # Proxmox
-      caddy_101: "pve.{$$INTERNAL_DOMAIN}"
-      caddy_101.reverse_proxy: "{$$PROXMOX_HOST}:8006"
-      caddy_101.reverse_proxy.import: https
+      caddy_20.4_import: service_proxy pve
+      caddy_20.4_import.reverse_proxy: "{$$PROXMOX_HOST}:8006"
+      caddy_20.4_import.reverse_proxy.import: https
 
       # TrueNAS
-      caddy_102: "truenas.{$$INTERNAL_DOMAIN}"
-      caddy_102.reverse_proxy: "{$$HEXOS_HOST}:80"
+      caddy_20.5_import: service_proxy truenas
+      caddy_20.5_import.reverse_proxy: "{$$HEXOS_HOST}:80"
 
       # Home Assistant OS
-      caddy_103: "ha.{$$INTERNAL_DOMAIN}"
-      caddy_103.reverse_proxy: "{$$HAOS_HOST}:8123"
+      caddy_20.6_import: service_proxy ha
+      caddy_20.6_import.reverse_proxy: "{$$HAOS_HOST}:8123"
 
   caddy-external:
     image: caddy:2

@@ -61,6 +61,7 @@ graph TB
             CADDY_EXT[External Reverse Proxy]
             IMMICH_PROXY[Immich Public Proxy]
             CADDY_INT[Internal Reverse Proxy]
+            ERROR_PAGES[Custom Error Pages]
         end
 
         subgraph "User Services"
@@ -106,6 +107,7 @@ graph TB
     TAILSCALE --> CADDY_INT
 
     %% Internal Service Routing
+    CADDY_INT --> ERROR_PAGES
     CADDY_INT --> IMMICH
     CADDY_INT --> PLAUSIBLE
     CADDY_INT --> POCKET_ID
@@ -137,7 +139,7 @@ graph TB
     classDef infra-services fill:#ba68c8,stroke:#9c27b0,stroke-width:2px,color:#fff
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
-    class TAILSCALE,CADDY_INT internal
+    class TAILSCALE,CADDY_INT,ERROR_PAGES internal
     class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
@@ -151,6 +153,8 @@ graph TB
 ### [Caddy](./caddy/)
 
 I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due to its robust feature set and ease of use. I use a custom build that includes the [Caddy-Docker-Proxy](https://github.com/lucaslorentz/caddy-docker-proxy) and [Cloudflare DNS](https://github.com/caddy-dns/cloudflare) plugins for label-based configuration and automatic SSL certificate management.
+
+I also use [Error Pages](https://github.com/tarampampam/error-pages) to provide custom error pages for my services, resulting in more user-friendly error information.
 
 ### [Beszel](./beszel/)
 
