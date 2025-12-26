@@ -60,6 +60,8 @@ services:
         "
         default-src 'self' blob: data: 'unsafe-inline' 'unsafe-eval';
         connect-src 'self' blob: https://api.iconify.design https://cdn.jsdelivr.net https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
+        font-src 'self' https://fonts.gstatic.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
         report-uri {$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT};
         report-to csp-endpoint;
         "
