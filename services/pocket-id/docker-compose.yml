@@ -1,6 +1,6 @@
 services:
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v1
+    image: ghcr.io/pocket-id/pocket-id:v2
     restart: always
     volumes:
       - data:/app/data
@@ -16,7 +16,6 @@ services:
     environment:
       APP_URL: "https://id.${INTERNAL_DOMAIN:?error}"
       TRUST_PROXY: true
-      KEYS_STORAGE: database
       ENCRYPTION_KEY_FILE: /run/secrets/encryption_key
       MAXMIND_LICENSE_KEY_FILE: /run/secrets/maxmind_license_key
       PUID: ${POCKET_ID_UID:?error}
