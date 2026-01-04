@@ -52,7 +52,7 @@ services:
     labels:
       diun.enable: true
       diun.watch_repo: false
-      diun.include_tags: ^latest-fat$
+      diun.include_tags: ^latest$
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy pdf
       caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
