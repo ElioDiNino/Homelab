@@ -73,7 +73,7 @@ services:
       caddy.import.reverse_proxy: "{{ upstreams 8000 }}"
       tinyauth.apps.healthchecks.config.domain: healthchecks.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.healthchecks.oauth.groups: admins
-      tinyauth.apps.healthchecks.path.allow: ^/(ping/|api/v3/status/$)
+      tinyauth.apps.healthchecks.path.allow: ^/(ping/|api/v3/(status/|checks/)$)
 
 secrets:
   db-name:
