@@ -1,0 +1,430 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v1
+    restart: always
+    configs:
+      - source: docker
+        target: /app/config/docker.yaml
+      - source: proxmox
+        target: /app/config/proxmox.yaml
+      - source: settings
+        target: /app/config/settings.yaml
+      - source: bookmarks
+        target: /app/config/bookmarks.yaml
+      - source: widgets
+        target: /app/config/widgets.yaml
+      - source: services
+        target: /app/config/services.yaml
+      - source: custom-css
+        target: /app/config/custom.css
+    secrets:
+      - beszel-username
+      - beszel-password
+      - gotify-api-token
+      - healthchecks-api-key
+      - immich-api-key
+      - portainer-api-key
+      - proxmox-api-token
+      - proxmox-api-secret
+      - truenas-api-key
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_VAR_INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_VAR_PORTAINER_ENVIRONMENT_ID: ${HOMEPAGE_PORTAINER_ENVIRONMENT_ID:?error}
+      HOMEPAGE_VAR_PROXMOX_HAOS_VMID: ${HOMEPAGE_PROXMOX_HAOS_VMID:?error}
+      HOMEPAGE_VAR_PROXMOX_HEXOS_VMID: ${HOMEPAGE_PROXMOX_HEXOS_VMID:?error}
+      HOMEPAGE_FILE_BESZEL_USERNAME: /run/secrets/beszel-username
+      HOMEPAGE_FILE_BESZEL_PASSWORD: /run/secrets/beszel-password
+      HOMEPAGE_FILE_GOTIFY_API_TOKEN: /run/secrets/gotify-api-token
+      HOMEPAGE_FILE_HEALTHCHECKS_API_KEY: /run/secrets/healthchecks-api-key
+      HOMEPAGE_FILE_IMMICH_API_KEY: /run/secrets/immich-api-key
+      HOMEPAGE_FILE_PORTAINER_API_KEY: /run/secrets/portainer-api-key
+      HOMEPAGE_FILE_PROXMOX_API_TOKEN: /run/secrets/proxmox-api-token
+      HOMEPAGE_FILE_PROXMOX_API_SECRET: /run/secrets/proxmox-api-secret
+      HOMEPAGE_FILE_TRUENAS_API_KEY: /run/secrets/truenas-api-key
+    networks:
+      - proxy-internal
+      - socket-proxy-homepage
+    labels:
+      diun.enable: true
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy ${DASHBOARD_SUBDOMAIN:?error}
+      caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+
+configs:
+  docker:
+    content: |
+      docker-vm:
+        host: socket-proxy
+        port: 2375
+
+  proxmox:
+    content: |
+      pve:
+        url: https://pve.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+        token: {{HOMEPAGE_FILE_PROXMOX_API_TOKEN}}
+        secret: {{HOMEPAGE_FILE_PROXMOX_API_SECRET}}
+
+  settings:
+    content: |
+      title: Homelab Dashboard
+      description: The dashboard for Elio's Homelab services.
+      theme: dark
+      color: neutral
+      headerStyle: clean
+      base: https://${DASHBOARD_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      language: en-CA
+      target: _blank
+      quicklaunch:
+        searchDescriptions: true
+        hideInternetSearch: true
+        mobileButtonPosition: bottom-right
+      hideVersion: true
+      disableUpdateCheck: true
+      statusStyle: dot
+      disableIndexing: true
+
+      iconStyle: theme
+      useEqualHeights: true
+
+      layout:
+        Main Tab:
+          tab: Main
+          header: false
+          M Group 1:
+            header: false
+            style: row
+            columns: 2
+            Home:
+              style: column
+              icon: mdi-home
+            Media:
+              style: column
+              icon: mdi-folder-multiple-image
+            Analytics:
+              style: column
+              icon: mdi-chart-line
+            Tools:
+              tab: Main
+              style: column
+              icon: mdi-tools
+
+        Administration Tab:
+          tab: Administration
+          header: false
+          style: row
+          A Group 1:
+            header: false
+            style: row
+            Monitoring:
+              style: row
+              columns: 3
+              icon: mdi-alert-circle
+            Infrastructure:
+              style: row
+              columns: 3
+              icon: mdi-server
+          A Group 2:
+            header: false
+            style: row
+            columns: 2
+            Authentication:
+              style: column
+              icon: mdi-shield-lock
+            Debugging:
+              style: column
+              icon: mdi-bug
+              initiallyCollapsed: true
+
+        # Bookmarks
+        Development:
+          tab: Administration
+          icon: mdi-code-greater-than
+        Documentation:
+          tab: Administration
+          icon: mdi-book-open-variant
+
+  bookmarks:
+    content: |
+      - Development:
+          - Task List:
+              - icon: mdi-format-list-bulleted
+                href: ${HOMEPAGE_TASKS_URL:?error}
+          - Homelab GitHub Repository:
+              - icon: github-light
+                href: https://github.com/ElioDiNino/Homelab
+      - Documentation:
+          - Homepage:
+              - icon: homepage
+                href: https://gethomepage.dev
+
+  widgets:
+    content: |
+      - logo:
+         icon: homepage
+      - greeting:
+          text_size: 2xl
+          text: Homelab Dashboard
+
+  services:
+    content: |
+      - Main Tab:
+          - M Group 1:
+              - Home:
+                  - Home Assistant:
+                      icon: home-assistant
+                      href: https://ha.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                      description: Home automation
+                      proxmoxNode: pve
+                      proxmoxVMID: {{HOMEPAGE_VAR_PROXMOX_HAOS_VMID}}
+                      weight: 100
+
+      - Administration Tab:
+          - A Group 1:
+              - Infrastructure:
+                  - Proxmox:
+                      icon: proxmox
+                      href: https://pve.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                      description: Hypervisor platform
+                      widget:
+                        type: proxmox
+                        url: https://pve.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                        username: {{HOMEPAGE_FILE_PROXMOX_API_TOKEN}}
+                        password: {{HOMEPAGE_FILE_PROXMOX_API_SECRET}}
+                        weight: 100
+                  - HexOS:
+                      icon: hexos
+                      href: https://deck.hexos.com
+                      description: Simple NAS management
+                      showStats: true
+                      proxmoxNode: pve
+                      proxmoxVMID: {{HOMEPAGE_VAR_PROXMOX_HEXOS_VMID}}
+                      weight: 200
+                  - TrueNAS:
+                      icon: truenas
+                      href: https://truenas.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                      description: Advanced NAS management
+                      weight: 201
+                      widget:
+                        type: truenas
+                        version: 2
+                        url: https://truenas.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                        key: {{HOMEPAGE_FILE_TRUENAS_API_KEY}}
+                        enablePools: true
+
+  custom-css:
+    content: |
+      * {
+        box-sizing: border-box;
+      }
+
+      .container {
+        padding: 0 10rem;
+      }
+
+      /* Header section */
+      #widgets-wrap {
+        column-gap: 0.75rem;
+        display: flex;
+        justify-content: flex-start;
+        opacity: 0.95;
+        margin-bottom: 2rem;
+      }
+
+      .information-widget-greeting > span {
+        font-weight: 500;
+        margin: 0;
+      }
+
+      .information-widget-logo {
+        > .resolved {
+          width: 2rem;
+          > img {
+            object-fit: scale-down;
+          }
+        }
+      }
+
+      #information-widgets-right {
+        display: none;
+      }
+
+      #tabs {
+        margin-bottom: 2rem;
+      }
+
+      /* Make toggles always visible */
+      svg.opacity-0 {
+        opacity: 1;
+        transform: scale(2);
+        transition: 300ms ease-in-out;
+      }
+
+      /* Text size */
+      .service-group-name,
+      .bookmark-group-name {
+        font-size: 1.825rem;
+        font-weight: 800;
+      }
+
+      .service-name,
+      .bookmark-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .service-description,
+      .bookmark-description {
+        font-size: 1rem;
+        font-weight: 400;
+      }
+
+      .bookmark-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      /* Card padding */
+      .service-card,
+      .bookmark-text {
+        padding: 1.2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        row-gap: 0.25rem;
+      }
+
+      .bookmark-icon {
+        padding: 1rem 2rem;
+        background-color: #2f648f;
+      }
+
+      /* Layout spacing */
+      #layout-groups,
+      .grid {
+        gap: 3rem;
+      }
+
+      .group {
+        gap: 0.25rem;
+      }
+
+      .services-list {
+        gap: 0.75rem 1.5rem;
+      }
+
+      /* Hover effect on service cards */
+      .service > div {
+        transition:
+          transform 300ms cubic-bezier(0.165, 0.84, 0.44, 1),
+          box-shadow 300ms;
+      }
+
+      .service > div:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Tabs */
+      #myTab {
+        display: flex;
+        width: min-content;
+        gap: 0.25rem;
+        background-color: transparent;
+        li {
+          height: auto;
+          border-radius: 0;
+          button {
+            background-color: transparent;
+            margin: 0;
+            width: auto;
+            border-radius: 0;
+            padding: 0.5rem 1.2rem;
+            transition: 150ms ease-in;
+            font-size: 1.2rem;
+          }
+        }
+      }
+
+      /* Unselected tab */
+      [role="tab"][aria-selected="false"] {
+        border-bottom: 3px color-mix(in oklab, var(--color-white) 5%, transparent) solid;
+        &:hover {
+          border-bottom: 3px grey solid;
+          transition: 150ms ease-in;
+        }
+      }
+
+      /* Selected tab */
+      [role="tab"][aria-selected="true"] {
+        font-weight: 800;
+        border-bottom: 3px #42a5f5 solid;
+        transition: 150ms ease-in;
+      }
+
+      /* Footer section */
+      #footer {
+        padding-bottom: 4rem;
+      }
+
+      #theme,
+      #revalidate {
+        align-items: center;
+        > svg {
+          height: 2rem;
+          width: auto;
+        }
+      }
+
+      /* Mobile specific */
+      @media (max-width: 481px) {
+        .container {
+          padding: 0 1rem;
+        }
+
+        .service-card,
+        .bookmark-text {
+          padding: 0.8rem 1rem;
+        }
+
+        button.fixed {
+          transform: scale(2);
+          right: calc(var(--spacing) * 7);
+          bottom: calc(var(--spacing) * 7);
+        }
+
+        #tabs {
+          justify-items: center;
+        }
+
+        #widgets-wrap {
+          justify-content: center;
+        }
+      }
+
+secrets:
+  beszel-username:
+    environment: HOMEPAGE_BESZEL_USERNAME
+  beszel-password:
+    environment: HOMEPAGE_BESZEL_PASSWORD
+  gotify-api-token:
+    environment: HOMEPAGE_GOTIFY_API_TOKEN
+  healthchecks-api-key:
+    environment: HOMEPAGE_HEALTHCHECKS_API_KEY
+  immich-api-key:
+    environment: HOMEPAGE_IMMICH_API_KEY
+  portainer-api-key:
+    environment: HOMEPAGE_PORTAINER_API_KEY
+  proxmox-api-token:
+    environment: HOMEPAGE_PROXMOX_API_TOKEN
+  proxmox-api-secret:
+    environment: HOMEPAGE_PROXMOX_API_SECRET
+  truenas-api-key:
+    environment: HOMEPAGE_TRUENAS_API_KEY
+
+networks:
+  proxy-internal:
+    external: true
+  socket-proxy-homepage:
+    external: true
