@@ -33,6 +33,18 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy photos
       caddy.import.reverse_proxy: "{{ upstreams 2283 }}"
+      homepage.group: Media
+      homepage.name: Immich
+      homepage.icon: immich
+      homepage.href: https://photos.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Personal photos and videos
+      homepage.weight: 1
+      homepage.widget.type: immich
+      homepage.widget.version: 2
+      homepage.widget.url: https://photos.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.widget.key: "{{HOMEPAGE_FILE_IMMICH_API_KEY}}"
+      homepage.widget.fields: '["photos", "videos", "storage"]'
+      homepage.widget.hideErrors: true
 
   immich-public-proxy:
     image: ghcr.io/alangrainger/immich-public-proxy:latest

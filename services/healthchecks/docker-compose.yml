@@ -74,6 +74,15 @@ services:
       tinyauth.apps.healthchecks.config.domain: healthchecks.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.healthchecks.oauth.groups: admins
       tinyauth.apps.healthchecks.path.allow: ^/(ping/|api/v3/(status/|checks/)$)
+      homepage.group: Monitoring
+      homepage.name: Healthchecks
+      homepage.icon: healthchecks
+      homepage.href: https://healthchecks.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Cron job monitor
+      homepage.weight: 3
+      homepage.widget.type: healthchecks
+      homepage.widget.url: https://healthchecks.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.widget.key: "{{HOMEPAGE_FILE_HEALTHCHECKS_API_KEY}}"
 
 secrets:
   db-name:

@@ -86,6 +86,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy analytics
       caddy.import.reverse_proxy: "{{ upstreams 8000 }}"
+      homepage.group: Analytics
+      homepage.name: Plausible
+      homepage.icon: plausible
+      homepage.href: https://analytics.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Website analytics
+      homepage.weight: 100
 
 secrets:
   db-password:

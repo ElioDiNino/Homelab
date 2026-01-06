@@ -15,6 +15,15 @@ services:
       tinyauth.apps.uptime-kuma.config.domain: status.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.uptime-kuma.oauth.groups: admins
       tinyauth.apps.uptime-kuma.path.allow: ^/(status/|assets/|upload/|icon.svg|api/(push/|badge/|status-page/))
+      homepage.group: Monitoring
+      homepage.name: Uptime Kuma
+      homepage.icon: uptime-kuma
+      homepage.href: https://status.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Service uptime monitor
+      homepage.weight: 2
+      homepage.widget.type: uptimekuma
+      homepage.widget.url: https://status.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.widget.slug: all
 
 volumes:
   data:
