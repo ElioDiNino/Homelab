@@ -16,7 +16,7 @@ services:
       SP_ALLOWHEALTHCHECK: true
       SP_LISTENIP: 0.0.0.0
       SP_LOGLEVEL: ${SOCKET_PROXY_LOG_LEVEL:-INFO}
-      SP_ALLOW_GET: (/v1\..{1,2})?/(_ping|version|info|containers/((\w+/)?json|\w+/stats(\?\S+)?)|images/\S+/json|networks(/.*)?|events(\?\S+)?)
+      SP_ALLOW_GET: (/v1\..{1,2})?/(_ping|version|info|containers/(([\w-]+/)?json|[\w-]+/stats(\?\S+)?)|images/\S+/json|networks(/.*)?|events(\?\S+)?)
       SP_ALLOW_HEAD: (/v1\..{1,2})?/_ping
     networks:
       - beszel-agent
