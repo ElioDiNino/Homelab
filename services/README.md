@@ -67,6 +67,7 @@ graph TB
         subgraph "User Services"
             IMMICH[Immich]
             PLAUSIBLE[Plausible]
+            HOMEPAGE[Homepage]
             POCKET_ID[Pocket ID]
             GOTIFY[Gotify]
             HEALTHCHECKS[Healthchecks]
@@ -110,6 +111,7 @@ graph TB
     CADDY_INT --> ERROR_PAGES
     CADDY_INT --> IMMICH
     CADDY_INT --> PLAUSIBLE
+    CADDY_INT --> HOMEPAGE
     CADDY_INT --> POCKET_ID
     CADDY_INT --> GOTIFY
     CADDY_INT --> HEALTHCHECKS
@@ -140,7 +142,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES internal
-    class IMMICH,PLAUSIBLE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,PLAUSIBLE,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -171,6 +173,10 @@ My authentication service of choice is [Pocket ID](https://pocket-id.org/). It i
 ### [Diun](./diun/)
 
 [Docker Image Update Notifier (Diun)](https://crazymax.dev/diun/) is an application for receiving notifications when a Docker image is updated on a Docker registry. I use it to monitor my important containers and notify me via 3rd-party integrations when a new image version is found.
+
+### [Homepage](./homepage/)
+
+I use [Homepage](https://gethomepage.dev/) as the central dashboard for my homelab. It provides a customizable and user-friendly interface to access and manage all my services in one place.
 
 ### [Uptime Kuma](./uptime-kuma/)
 
