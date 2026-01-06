@@ -17,6 +17,7 @@
     "ODROID",
     "passwordless",
     "pocketid",
-    "tinyauth"
+    "tinyauth",
+    "TrueNAS"
   ]
 }
