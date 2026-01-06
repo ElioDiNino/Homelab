@@ -21,6 +21,16 @@ services:
       caddy.import: service_proxy portainer
       caddy.import.reverse_proxy: "{{ upstreams 9443 }}"
       caddy.import.reverse_proxy.import: https
+      homepage.group: Infrastructure
+      homepage.name: Portainer
+      homepage.icon: portainer-dark
+      homepage.href: https://portainer.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Container management
+      homepage.weight: 300
+      homepage.widget.type: portainer
+      homepage.widget.url: https://portainer.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.widget.env: "{{HOMEPAGE_VAR_PORTAINER_ENVIRONMENT_ID}}"
+      homepage.widget.key: "{{HOMEPAGE_FILE_PORTAINER_API_KEY}}"
 
 volumes:
   data:

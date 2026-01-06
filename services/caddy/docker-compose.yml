@@ -40,6 +40,12 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+      homepage.group: Debugging
+      homepage.name: Ping
+      homepage.icon: mdi-connection
+      homepage.href: https://ping.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Network connection test
+      homepage.weight: 2
 
   error-pages:
     image: ghcr.io/tarampampam/error-pages:3
@@ -134,6 +140,12 @@ services:
       caddy_20.2_import.reverse_proxy: "{{ upstreams 80 }}"
       tinyauth.apps.whoami.config.domain: whoami.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.whoami.oauth.groups: admins
+      homepage.group: Debugging
+      homepage.name: Who Am I
+      homepage.icon: mdi-account-question
+      homepage.href: https://whoami.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Request inspection
+      homepage.weight: 1
 
       # Internal access check
       caddy_20.3_import: service_proxy ping

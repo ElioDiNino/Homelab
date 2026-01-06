@@ -27,6 +27,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy id
       caddy.import.reverse_proxy: "{{ upstreams 1411 }}"
+      homepage.group: Home
+      homepage.name: Pocket ID
+      homepage.icon: pocket-id
+      homepage.href: https://id.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Centralized account management
+      homepage.weight: 1
 
 secrets:
   encryption_key:

@@ -23,6 +23,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy convert
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+      homepage.group: Tools
+      homepage.name: ConvertX
+      homepage.icon: mdi-file-swap
+      homepage.href: https://convert.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: File converter
+      homepage.weight: 200
 
 volumes:
   data:

@@ -45,7 +45,6 @@ services:
       SYSTEM_ENABLEDESKTOPINSTALLSLIDE: false
       SYSTEM_MAXFILESIZE: 200MB
       UI_LOGOSTYLE: modern
-      UI_APPNAMENAVBAR: PDF Tools
       SHOW_SURVEY: false
     networks:
       - proxy-internal
@@ -66,6 +65,12 @@ services:
         report-to csp-endpoint;
         "
       caddy.import.header.Reporting-Endpoints: csp-endpoint="{$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT}"
+      homepage.group: Tools
+      homepage.name: Stirling PDF
+      homepage.icon: stirling-pdf
+      homepage.href: https://pdf.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: All-in-one PDF toolkit
+      homepage.weight: 100
 
 volumes:
   data:

@@ -30,6 +30,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy auth
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+      homepage.group: Authentication
+      homepage.name: Tinyauth
+      homepage.icon: tinyauth
+      homepage.href: https://auth.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Authentication proxy
+      homepage.weight: 100
 
 secrets:
   client_secret:

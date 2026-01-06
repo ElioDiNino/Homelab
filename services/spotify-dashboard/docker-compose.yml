@@ -24,6 +24,12 @@ services:
       caddy.import: service_proxy sd
       caddy.import.handle_path: "/api/*"
       caddy.import.handle_path.reverse_proxy: "{{ upstreams 8080 }}"
+      homepage.group: Analytics
+      homepage.name: Spotify Dashboard
+      homepage.icon: spotify
+      homepage.href: https://sd.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Spotify listening statistics
+      homepage.weight: 200
 
   mongo:
     # Using an older version due to hardware compatibility

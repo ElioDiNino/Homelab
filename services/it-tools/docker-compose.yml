@@ -11,6 +11,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy tools
       caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
+      homepage.group: Tools
+      homepage.name: IT Tools
+      homepage.icon: it-tools-light
+      homepage.href: https://tools.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Developer and IT utilities
+      homepage.weight: 400
 
 networks:
   proxy-internal:

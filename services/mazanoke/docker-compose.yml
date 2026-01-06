@@ -11,6 +11,12 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy optimize
       caddy.import.reverse_proxy: "{{ upstreams 80 }}"
+      homepage.group: Tools
+      homepage.name: Mazanoke
+      homepage.icon: mazanoke
+      homepage.href: https://optimize.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Image optimization
+      homepage.weight: 200
 
 networks:
   proxy-internal:
