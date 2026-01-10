@@ -41,9 +41,12 @@ services:
     environment:
       # Ref: https://docs.stirlingpdf.com/Configuration
       LANGS: en_US,en_GB
+      DISABLE_ADDITIONAL_FEATURES: true
+      DOCKER_ENABLE_SECURITY: false
+      SYSTEM_SHOWSETTINGSWHENNOLOGIN: false
       SYSTEM_ENABLEANALYTICS: false
       SYSTEM_ENABLEDESKTOPINSTALLSLIDE: false
-      SYSTEM_MAXFILESIZE: 200MB
+      SYSTEM_FILEUPLOADLIMIT: 200MB
       UI_LOGOSTYLE: modern
       SHOW_SURVEY: false
     networks:
@@ -58,7 +61,7 @@ services:
       caddy.import.header.Content-Security-Policy: >
         "
         default-src 'self' blob: data: 'unsafe-inline' 'unsafe-eval';
-        connect-src 'self' blob: https://api.iconify.design https://cdn.jsdelivr.net https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
+        connect-src 'self' blob: data: https://api.iconify.design https://cdn.jsdelivr.net https://supabase.stirling.com/functions/v1/updates https://*.sentry.io;
         font-src 'self' https://fonts.gstatic.com;
         style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
         report-uri {$$SENTRY_CSP_ENDPOINT}&sentry_environment={$$ENVIRONMENT};
