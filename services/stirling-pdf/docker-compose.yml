@@ -43,7 +43,7 @@ services:
       LANGS: en_US,en_GB
       SYSTEM_ENABLEANALYTICS: false
       SYSTEM_ENABLEDESKTOPINSTALLSLIDE: false
-      SYSTEM_MAXFILESIZE: 200MB
+      SYSTEM_FILEUPLOADLIMIT: 200MB
       UI_LOGOSTYLE: modern
       SHOW_SURVEY: false
     networks:
