@@ -41,6 +41,9 @@ services:
     environment:
       # Ref: https://docs.stirlingpdf.com/Configuration
       LANGS: en_US,en_GB
+      DISABLE_ADDITIONAL_FEATURES: true
+      DOCKER_ENABLE_SECURITY: false
+      SYSTEM_SHOWSETTINGSWHENNOLOGIN: false
       SYSTEM_ENABLEANALYTICS: false
       SYSTEM_ENABLEDESKTOPINSTALLSLIDE: false
       SYSTEM_FILEUPLOADLIMIT: 200MB
