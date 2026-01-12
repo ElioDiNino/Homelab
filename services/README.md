@@ -20,6 +20,7 @@ docker network create proxy-internal
 docker network create proxy-external
 docker network create proxy-plausible --internal
 docker network create proxy-immich-public --internal
+docker network create proxy-ottrbox --internal
 docker compose up -d
 ```
 
@@ -67,6 +68,7 @@ graph TB
         subgraph "User Services"
             IMMICH[Immich]
             PLAUSIBLE[Plausible]
+            OTTRBOX[OttrBox]
             HOMEPAGE[Homepage]
             POCKET_ID[Pocket ID]
             GOTIFY[Gotify]
@@ -99,6 +101,7 @@ graph TB
     CF_TUNNEL --> CADDY_EXT
 
     %% External Service Routing
+    CADDY_EXT --> OTTRBOX
     CADDY_EXT --> IMMICH_PROXY
     IMMICH_PROXY --> IMMICH
     CADDY_EXT --> PLAUSIBLE
@@ -142,7 +145,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES internal
-    class IMMICH,PLAUSIBLE,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -203,6 +206,10 @@ To facilitate secure public access to a subset of my services, I use [Cloudflare
 ### [Plausible](./plausible/)
 
 [Plausible](https://plausible.io/) is a web analytics tool that is privacy-friendly and compliant with GDPR. It provides insights into website traffic without compromising user privacy. I use it to track and analyze the traffic to my internal and external services.
+
+### [OttrBox](./ottrbox/)
+
+[OttrBox](https://github.com/aottr/ottrbox) is a fork of the archived [Pingvin Share](https://github.com/stonith404/pingvin-share) project. It is a self-hosted file sharing service that I expose publicly to send and receive files easily and securely.
 
 ### [Stirling PDF](./stirling-pdf/)
 
