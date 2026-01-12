@@ -179,11 +179,13 @@ services:
       - proxy-external
       - proxy-plausible
       - proxy-immich-public
+      - proxy-ottrbox
     environment:
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
       INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
+      OTTRBOX_EXTERNAL_SUBDOMAIN: ${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}
     labels:
       diun.enable: true
 
@@ -220,6 +222,10 @@ configs:
         }
       }
 
+      {$$OTTRBOX_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+        reverse_proxy ottrbox:3000
+      }
+
       :80 {
         import default_404
       }
@@ -244,4 +250,6 @@ networks:
   proxy-plausible:
     external: true
   proxy-immich-public:
+    external: true
+  proxy-ottrbox:
     external: true

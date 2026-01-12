@@ -1,0 +1,89 @@
+services:
+  ottrbox:
+    image: ghcr.io/aottr/ottrbox:v1
+    restart: always
+    configs:
+      - source: config
+        target: /opt/app/config.yaml
+    volumes:
+      - data:/opt/app/backend/data
+    environment:
+      TRUST_PROXY: true
+    networks:
+      - proxy-internal
+      - proxy-ottrbox
+    labels:
+      diun.enable: true
+      homepage.group: Media
+      homepage.name: OttrBox
+      homepage.icon: pingvin-share
+      homepage.href: https://${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_EXTERNAL_DOMAIN}}
+      homepage.description: Temporary file sharing
+      homepage.weight: 100
+
+configs:
+  config:
+    content: |
+      # Ref: https://github.com/aottr/ottrbox/blob/main/config.example.yaml
+      general:
+        appUrl: https://${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
+        secureCookies: "true"
+        showHomePage: "false"
+        sessionDuration: 1 day
+      share:
+        allowRegistration: "false"
+        allowUnauthenticatedShares: "false"
+        maxExpiration: 1 month
+        shareIdLength: "12"
+        maxSize: "1000000000" # 1 GB
+        zipCompressionLevel: "9"
+        chunkSize: "10000000" # 10 MB
+        autoOpenShareModal: "false"
+        allowAdminAccessAllShares: "true"
+      cache:
+        redis-enabled: "false"
+      email:
+        enableShareEmailRecipients: "true"
+        enableShareEmailPastRecipients: "false"
+      smtp:
+        enabled: "true"
+        allowUnauthorizedCertificates: "false"
+        host: "${SMTP_HOST_ADDR:?error}"
+        port: "${SMTP_HOST_PORT:?error}"
+        email: "${SMTP_EMAIL:?error}"
+        username: "${SMTP_USER_NAME:?error}"
+        password: "${SMTP_USER_PWD:?error}"
+      ldap:
+        enabled: "false"
+      oauth:
+        allowRegistration: "true"
+        ignoreTotp: "true"
+        disablePassword: "true"
+        github-enabled: "false"
+        google-enabled: "false"
+        microsoft-enabled: "false"
+        discord-enabled: "false"
+        oidc-enabled: "true"
+        oidc-discoveryUri: "https://id.${INTERNAL_DOMAIN:?error}/.well-known/openid-configuration"
+        oidc-signOut: "true"
+        oidc-scope: openid email profile groups
+        oidc-usernameClaim: "preferred_username"
+        oidc-roleGeneralAccess: "users"
+        oidc-roleAdminAccess: "admins"
+        oidc-clientId: "${OTTRBOX_OIDC_CLIENT_ID:?error}"
+        oidc-clientSecret: "${OTTRBOX_OIDC_CLIENT_SECRET:?error}"
+      s3:
+        enabled: "false"
+      legal:
+        enabled: "false"
+      initUser:
+        enabled: false
+
+volumes:
+  data:
+
+networks:
+  proxy-internal:
+    external: true
+  proxy-ottrbox:
+    external: true
