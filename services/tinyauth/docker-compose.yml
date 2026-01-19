@@ -30,6 +30,8 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy auth
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+      socket-proxy.allow.get: (/v1\.\d{1,2})?/containers/(json|[\w.-]+/json)(\?\S+)?
+      socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
       homepage.group: Authentication
       homepage.name: Tinyauth
       homepage.icon: tinyauth

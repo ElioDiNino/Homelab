@@ -48,6 +48,7 @@ services:
       - socket-proxy-homepage
     labels:
       diun.enable: true
+      socket-proxy.allow.get: (/v1\.\d{1,2})?/containers/(json|[\w.-]+/(json|stats))(\?\S+)?
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy ${DASHBOARD_SUBDOMAIN:?error}
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
