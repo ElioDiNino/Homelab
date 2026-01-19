@@ -47,3 +47,7 @@ repos:
         additional_dependencies:
           # Ref: https://github.com/rhysd/actionlint/issues/477
           - "github.com/wasilibs/go-shellcheck/cmd/shellcheck@v0.11.1"
+
+ci:
+  autofix_prs: false
+  autoupdate_commit_msg: "chore(deps): pre-commit autoupdate hooks"
