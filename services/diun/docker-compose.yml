@@ -27,6 +27,8 @@ services:
       - socket-proxy-diun
     labels:
       diun.enable: true
+      socket-proxy.allow.get: (/v1\.\d{1,2})?/(version|containers/json(\?\S+)?|images/[\w./:+-]+/json)
+      socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
 
 secrets:
   discord_webhook_url:
