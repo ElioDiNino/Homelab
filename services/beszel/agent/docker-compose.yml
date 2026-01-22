@@ -23,7 +23,7 @@ services:
       - socket-proxy-beszel-agent
     labels:
       diun.enable: true
-      socket-proxy.allow.get: (/v1\.\d{1,2})?/containers/(json|[\w.-]+/(json|stats))(\?\S+)?
+      socket-proxy.allow.get: (/v1\.\d{1,2})?/(version|info|containers/(json|[\w.-]+/(json|stats))(\?\S+)?)
 
 secrets:
   agent_key:
