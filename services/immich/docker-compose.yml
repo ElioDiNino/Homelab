@@ -83,6 +83,7 @@ services:
             "controls": true,
             "download": true,
             "loop": false,
+            "customSlideName": true,
             "allowMediaOverlap": true,
 
             "thumbnail": true,
