@@ -17,16 +17,22 @@ services:
   plausible_events_db:
     image: clickhouse/clickhouse-server:24.12-alpine
     restart: always
+    configs:
+      - source: clickhouse-logs
+        target: /etc/clickhouse-server/config.d/logs.xml
+      # This makes ClickHouse bind to IPv4 only, since Docker doesn't enable IPv6 in bridge networks by default.
+      # Fixes "Listen [::]:9000 failed: Address family for hostname not supported" warnings.
+      - source: clickhouse-ipv4-only
+        target: /etc/clickhouse-server/config.d/ipv4-only.xml
+      # The following configuration files make ClickHouse consume less resources, which is useful for small setups.
+      # https://clickhouse.com/docs/en/operations/tips#using-less-than-16gb-of-ram
+      - source: clickhouse-low-resources
+        target: /etc/clickhouse-server/config.d/low-resources.xml
+      - source: clickhouse-default-profile-low-resources-overrides
+        target: /etc/clickhouse-server/users.d/default-profile-low-resources-overrides.xml
     volumes:
       - event-data:/var/lib/clickhouse
       - event-logs:/var/log/clickhouse-server
-      - ./clickhouse/logs.xml:/etc/clickhouse-server/config.d/logs.xml:ro
-      # This makes ClickHouse bind to IPv4 only, since Docker doesn't enable IPv6 in bridge networks by default.
-      # Fixes "Listen [::]:9000 failed: Address family for hostname not supported" warnings.
-      - ./clickhouse/ipv4-only.xml:/etc/clickhouse-server/config.d/ipv4-only.xml:ro
-      # This makes ClickHouse consume less resources, which is useful for small setups.
-      # https://clickhouse.com/docs/en/operations/tips#using-less-than-16gb-of-ram
-      - ./clickhouse/low-resources.xml:/etc/clickhouse-server/config.d/low-resources.xml:ro
     ulimits:
       nofile:
         soft: 262144
@@ -92,6 +98,73 @@ services:
       homepage.href: https://analytics.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: Website analytics
       homepage.weight: 100
+
+configs:
+  clickhouse-logs:
+    content: |
+      <clickhouse>
+          <logger>
+              <level>warning</level>
+              <console>true</console>
+          </logger>
+
+          <query_log replace="1">
+              <database>system</database>
+              <table>query_log</table>
+              <flush_interval_milliseconds>7500</flush_interval_milliseconds>
+              <engine>
+                  ENGINE = MergeTree
+                  PARTITION BY event_date
+                  ORDER BY (event_time)
+                  TTL event_date + interval 30 day
+                  SETTINGS ttl_only_drop_parts=1
+              </engine>
+          </query_log>
+
+          <!-- Stops unnecessary logging -->
+          <metric_log remove="remove" />
+          <asynchronous_metric_log remove="remove" />
+          <query_thread_log remove="remove" />
+          <text_log remove="remove" />
+          <trace_log remove="remove" />
+          <session_log remove="remove" />
+          <part_log remove="remove" />
+      </clickhouse>
+
+  clickhouse-ipv4-only:
+    content: |
+      <clickhouse>
+          <listen_host>0.0.0.0</listen_host>
+      </clickhouse>
+
+  clickhouse-low-resources:
+    content: |
+      <clickhouse>
+          <!-- https://clickhouse.com/docs/en/operations/server-configuration-parameters/settings#mark_cache_size -->
+          <mark_cache_size>524288000</mark_cache_size>
+      </clickhouse>
+
+  clickhouse-default-profile-low-resources-overrides:
+    content: |
+      <!-- https://clickhouse.com/docs/en/operations/tips#using-less-than-16gb-of-ram -->
+      <clickhouse>
+          <profiles>
+              <default>
+                  <!-- https://clickhouse.com/docs/en/operations/settings/settings#max_threads -->
+                  <max_threads>1</max_threads>
+                  <!-- https://clickhouse.com/docs/en/operations/settings/settings#max_block_size -->
+                  <max_block_size>8192</max_block_size>
+                  <!-- https://clickhouse.com/docs/en/operations/settings/settings#max_download_threads -->
+                  <max_download_threads>1</max_download_threads>
+                  <!--
+                  https://clickhouse.com/docs/en/operations/settings/settings#input_format_parallel_parsing -->
+                  <input_format_parallel_parsing>0</input_format_parallel_parsing>
+                  <!--
+                  https://clickhouse.com/docs/en/operations/settings/settings#output_format_parallel_formatting -->
+                  <output_format_parallel_formatting>0</output_format_parallel_formatting>
+              </default>
+          </profiles>
+      </clickhouse>
 
 secrets:
   db-password:
