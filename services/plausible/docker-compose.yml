@@ -15,7 +15,7 @@ services:
       - database
 
   plausible_events_db:
-    image: clickhouse/clickhouse-server:24.12-alpine
+    image: clickhouse/clickhouse-server:26.1-alpine
     restart: always
     configs:
       - source: clickhouse-logs
