@@ -9,7 +9,7 @@ STATUS=$(upsc "$UPS" ups.status)
 CHARGE=$(upsc "$UPS" battery.charge)
 CHMSG="[$STATUS]:$CHARGE%"
 
-SUBJECT="Proxmox ($PROXMOXHOST): UPS Warning"
+SUBJECT="Proxmox ($PROXMOXHOST): UPS Alert"
 LOGGER_TAG="upssched-cmd"
 
 case $1 in
@@ -28,11 +28,11 @@ lowbatt)
     echo "$MSG" | mailx -s "$SUBJECT" "$EMAIL"
     logger -t "$LOGGER_TAG" "$MSG"
     ;;
-shutafter5min)
-    MSG="Shutting down after 5 minutes of lost power"
+shutdown-timer)
+    MSG="Sending NUT shutdown command after 5 minutes of lost power"
     echo "$MSG" | mailx -s "$SUBJECT" "$EMAIL"
     logger -t "$LOGGER_TAG" "$MSG"
-    shutdown
+    upsmon -c fsd
     ;;
 fsd)
     MSG="Forced shutdown from UPS ($CHMSG)!"
