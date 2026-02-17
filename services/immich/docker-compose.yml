@@ -74,6 +74,7 @@ services:
             "allowSlugLinks": false,
             "showHomePage": true,
             "showGalleryTitle": true,
+            "showGalleryDescription": true,
             "showMetadata": {
               "description": true
             },
