@@ -12,7 +12,6 @@ services:
       timeout: 5s
       retries: 2
     environment:
-      SP_ALLOWFROM: beszel-agent,beszel-local-agent
       SP_PROXYCONTAINERNAME: socket-proxy
       SP_ALLOWHEALTHCHECK: true
       SP_LISTENIP: 0.0.0.0
