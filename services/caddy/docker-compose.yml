@@ -163,6 +163,7 @@ services:
       caddy_20.5_import: service_proxy truenas
       caddy_20.5_import.reverse_proxy: "{$$HEXOS_HOST}:443"
       caddy_20.5_import.reverse_proxy.import: https
+      caddy_20.5_import.reverse_proxy.header_up: Host {host}
 
       # Home Assistant OS
       caddy_20.6_import: service_proxy ha

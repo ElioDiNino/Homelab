@@ -11,6 +11,8 @@ services:
       - data:/data
     ports:
       - 9443:9443
+    environment:
+      TRUSTED_ORIGINS: portainer.${INTERNAL_DOMAIN:?error}
     networks:
       - proxy-internal
     labels:
