@@ -16,8 +16,8 @@ cp .env.example .env
 ### Start services
 
 ```sh
-docker network create proxy-internal
-docker network create proxy-external
+docker network create proxy-internal --ipv6
+docker network create proxy-external --ipv6
 docker network create proxy-plausible --internal
 docker network create proxy-immich-public --internal
 docker network create proxy-ottrbox --internal
