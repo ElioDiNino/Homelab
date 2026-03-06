@@ -50,6 +50,7 @@ services:
       SYSTEM_MOBILESCANNERSETTINGS_PAGEFORMAT: keep
       SYSTEM_MAXFILESIZE: 200
       UI_LOGOSTYLE: modern
+      UI_HIDEDISABLEDTOOLS_GOOGLEDRIVE: true
       SHOW_SURVEY: false
     networks:
       - proxy-internal
