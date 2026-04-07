@@ -24,6 +24,7 @@ services:
       DB_PASSWORD_FILE: /run/secrets/db_password
       REDIS_PASSWORD: ${IMMICH_CACHE_PASSWORD:?error}
       IMMICH_TRUSTED_PROXIES: 172.16.0.0/12
+      IMMICH_HELMET_FILE: true
     networks:
       - frontend
       - backend
@@ -126,7 +127,7 @@ services:
           memory: ${IMMICH_ML_MEMORY_LIMIT:?error}
 
   redis:
-    image: docker.io/valkey/valkey:9@sha256:3eeb09785cd61ec8e3be35f8804c8892080f3ca21934d628abc24ee4ed1698f6
+    image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
     restart: always
     healthcheck:
       test: valkey-cli ping || exit 1
