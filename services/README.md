@@ -74,6 +74,7 @@ graph TB
             GOTIFY[Gotify]
             HEALTHCHECKS[Healthchecks]
             UPTIME_KUMA[Uptime Kuma]
+            AIRTRAIL[AirTrail]
             STIRLING[Stirling PDF]
             MAZANOKE[Mazanoke]
             CONVERTX[ConvertX]
@@ -119,6 +120,7 @@ graph TB
     CADDY_INT --> GOTIFY
     CADDY_INT --> HEALTHCHECKS
     CADDY_INT --> UPTIME_KUMA
+    CADDY_INT --> AIRTRAIL
     CADDY_INT --> STIRLING
     CADDY_INT --> MAZANOKE
     CADDY_INT --> CONVERTX
@@ -145,7 +147,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES internal
-    class IMMICH,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -210,6 +212,10 @@ To facilitate secure public access to a subset of my services, I use [Cloudflare
 ### [OttrBox](./ottrbox/)
 
 [OttrBox](https://github.com/aottr/ottrbox) is a fork of the archived [Pingvin Share](https://github.com/stonith404/pingvin-share) project. It is a self-hosted file sharing service that I expose publicly to send and receive files easily and securely.
+
+### [AirTrail](./airtrail/)
+
+[AirTrail](https://airtrail.johan.ohly.dk/) is a flight tracking and logging application. It provides a web interface to log flights, view statistics, and integrate with various flight tracking services.
 
 ### [Stirling PDF](./stirling-pdf/)
 
