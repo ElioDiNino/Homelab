@@ -3,7 +3,7 @@ services:
     image: postgres:16-alpine
     restart: always
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${AIRTRAIL_DB_USERNAME:?error} -d ${AIRTRAIL_DB_DATABASE_NAME:?error}']
       start_period: 1m
@@ -65,7 +65,7 @@ services:
       homepage.weight: 150
 
 volumes:
-  db_data:
+  db-data:
   uploads:
 
 networks:
