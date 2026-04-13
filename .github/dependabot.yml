@@ -1,5 +1,5 @@
 # Please see the documentation for all configuration options:
-# https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+# https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
 
 version: 2
 updates:
@@ -7,6 +7,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       dependencies:
         patterns:
@@ -17,6 +19,8 @@ updates:
       - "/services/*"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     ignore:
       - dependency-name: "mongo"
         versions: [">= 4.4.19"]
@@ -26,6 +30,8 @@ updates:
       - "/services/*"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     ignore:
       - dependency-name: "mongo"
         versions: [">= 4.4.19"]
