@@ -1,0 +1,75 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${AIRTRAIL_DB_USERNAME:?error} -d ${AIRTRAIL_DB_DATABASE_NAME:?error}']
+      start_period: 1m
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - database
+    environment:
+      POSTGRES_DB: ${AIRTRAIL_DB_DATABASE_NAME:?error}
+      POSTGRES_USER: ${AIRTRAIL_DB_USERNAME:?error}
+      POSTGRES_PASSWORD: ${AIRTRAIL_DB_PASSWORD:?error}
+
+  airtrail-volume-perms:
+    image: alpine:latest
+    command: sh -c "chown -R 1000:1000 /tmp/airtrail-uploads"
+    volumes:
+      - uploads:/tmp/airtrail-uploads
+
+  airtrail:
+    image: johly/airtrail:latest
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      airtrail-volume-perms:
+        condition: service_completed_successfully
+    volumes:
+      - uploads:/app/uploads
+    environment:
+      ORIGIN: https://airtrail.${INTERNAL_DOMAIN:?error}
+      DB_URL: postgres://${AIRTRAIL_DB_USERNAME:?error}:${AIRTRAIL_DB_PASSWORD:?error}@db:5432/${AIRTRAIL_DB_DATABASE_NAME:?error}
+      UPLOAD_LOCATION: /app/uploads
+      OAUTH_ENABLED: true
+      OAUTH_ISSUER_URL: https://id.${INTERNAL_DOMAIN:?error}/.well-known/openid-configuration
+      OAUTH_CLIENT_ID: ${AIRTRAIL_OAUTH_CLIENT_ID:?error}
+      OAUTH_CLIENT_SECRET: ${AIRTRAIL_OAUTH_CLIENT_SECRET:?error}
+      OAUTH_SCOPE: openid profile
+      OAUTH_AUTO_REGISTER: true
+      OAUTH_AUTO_LOGIN: true
+      OAUTH_HIDE_PASSWORD_FORM: true
+      OAUTH_BUTTON_TEXT: "Log in with Pocket ID"
+      INTEGRATIONS_AERO_DATA_BOX_KEY: ${AIRTRAIL_AERO_DATA_BOX_KEY:?error}
+    networks:
+      - proxy-internal
+      - database
+    labels:
+      diun.enable: true
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy airtrail
+      caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+      homepage.group: Analytics
+      homepage.name: AirTrail
+      homepage.icon: air-trail
+      homepage.href: https://airtrail.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: Personal flight tracking and analytics
+      homepage.weight: 150
+
+volumes:
+  db_data:
+  uploads:
+
+networks:
+  database:
+    internal: true
+  proxy-internal:
+    external: true
