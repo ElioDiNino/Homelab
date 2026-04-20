@@ -177,7 +177,7 @@ configs:
               - Home:
                   - Home Assistant:
                       icon: home-assistant
-                      href: https://ha.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}/auth/oidc/welcome
+                      href: https://ha.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
                       description: Home automation
                       proxmoxNode: pve
                       proxmoxVMID: {{HOMEPAGE_VAR_PROXMOX_HAOS_VMID}}
