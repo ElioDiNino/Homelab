@@ -64,6 +64,14 @@ services:
       homepage.href: https://airtrail.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: Personal flight tracking and analytics
       homepage.weight: 150
+      homepage.widget.type: customapi
+      homepage.widget.url: https://airtrail.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}/api/flight/list?scope=all
+      homepage.widget.headers.Authorization: Bearer {{HOMEPAGE_FILE_AIRTRAIL_API_KEY}}
+      homepage.widget.refreshInterval: 300000 # 5 minutes
+      homepage.widget.mappings[0].label: Total Flights
+      homepage.widget.mappings[0].field: flights
+      homepage.widget.mappings[0].format: size
+      homepage.widget.hideErrors: true
 
 volumes:
   db-data:
