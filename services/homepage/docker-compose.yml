@@ -27,6 +27,7 @@ services:
       - proxmox-api-token
       - proxmox-api-secret
       - truenas-api-key
+      - airtrail-api-key
     environment:
       HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
       HOMEPAGE_VAR_EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
@@ -34,6 +35,7 @@ services:
       HOMEPAGE_VAR_PORTAINER_ENVIRONMENT_ID: ${HOMEPAGE_PORTAINER_ENVIRONMENT_ID:?error}
       HOMEPAGE_VAR_PROXMOX_HAOS_VMID: ${HOMEPAGE_PROXMOX_HAOS_VMID:?error}
       HOMEPAGE_VAR_PROXMOX_HEXOS_VMID: ${HOMEPAGE_PROXMOX_HEXOS_VMID:?error}
+      HOMEPAGE_FILE_AIRTRAIL_API_KEY: /run/secrets/airtrail-api-key
       HOMEPAGE_FILE_BESZEL_USERNAME: /run/secrets/beszel-username
       HOMEPAGE_FILE_BESZEL_PASSWORD: /run/secrets/beszel-password
       HOMEPAGE_FILE_GOTIFY_API_TOKEN: /run/secrets/gotify-api-token
@@ -406,6 +408,8 @@ configs:
       }
 
 secrets:
+  airtrail-api-key:
+    environment: HOMEPAGE_AIRTRAIL_API_KEY
   beszel-username:
     environment: HOMEPAGE_BESZEL_USERNAME
   beszel-password:
