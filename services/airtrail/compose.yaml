@@ -47,6 +47,7 @@ services:
       OAUTH_HIDE_PASSWORD_FORM: true
       OAUTH_BUTTON_TEXT: "Log in with Pocket ID"
       INTEGRATIONS_AERO_DATA_BOX_KEY: ${AIRTRAIL_AERO_DATA_BOX_KEY:?error}
+      INTEGRATIONS_OPEN_AIP_KEY: ${AIRTRAIL_OPEN_AIP_KEY:?error}
     networks:
       - proxy-internal
       - database
