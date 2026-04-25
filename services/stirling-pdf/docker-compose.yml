@@ -77,6 +77,10 @@ services:
       homepage.href: https://pdf.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: All-in-one PDF toolkit
       homepage.weight: 100
+    deploy:
+      resources:
+        limits:
+          memory: ${STIRLING_PDF_MEMORY_LIMIT:?error}
 
 volumes:
   data:
