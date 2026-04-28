@@ -4,25 +4,19 @@ on:
   push:
     branches:
       - main
-    paths:
+    paths: &build-paths
       - "services/**/Dockerfile"
       - ".github/workflows/build-images.yml"
   pull_request:
     branches:
       - main
-    paths:
-      - "services/**/Dockerfile"
-      - ".github/workflows/build-images.yml"
+    paths: *build-paths
   workflow_dispatch:
     inputs:
       service:
         description: "Service to build (optional, builds all if not specified)"
         required: false
         default: ""
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   output-services:
@@ -73,63 +67,38 @@ jobs:
     needs: output-services
     name: Build and Publish Image
     if: ${{ needs.output-services.outputs.services != '[]' }}
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         service: ${{ fromJson(needs.output-services.outputs.services) }}
+        include:
+          - registry: ghcr.io
     permissions:
       contents: read
       packages: write
-      attestations: write
       id-token: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v4.0.0
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
-
-      - name: Log in to Container Registry
-        id: login
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
-        with:
-          registry: ${{ env.REGISTRY }}
+    uses: docker/github-builder/.github/workflows/build.yml@7d2a02426d4b989616ba5aaee4e879afd4134b0d # v1.6.0
+    with:
+      output: image
+      push: ${{ github.event_name != 'pull_request' }}
+      platforms: linux/amd64,linux/arm64,linux/arm/v7
+      context: ./services/${{ matrix.service }}
+      meta-images: ${{ matrix.registry }}/${{ github.repository }}/${{ matrix.service }}
+      meta-tags: |
+        type=ref,event=branch
+        type=ref,event=pr
+        type=sha,enable={{is_default_branch}}
+        type=raw,value=latest,enable={{is_default_branch}}
+      cache: true
+      cache-mode: max
+      sbom: true
+      set-meta-annotations: true
+      set-meta-labels: true
+      annotations: &labels |
+        org.opencontainers.image.authors=https://github.com/${{ github.repository_owner }}
+        org.opencontainers.image.documentation=https://github.com/${{ github.repository }}/tree/main/services/
+      labels: *labels
+    secrets:
+      registry-auths: |
+        - registry: ${{ matrix.registry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,enable={{is_default_branch}}
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: Build and push Docker image
-        id: build
-        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
-        with:
-          context: ./services/${{ matrix.service }}
-          file: ./services/${{ matrix.service }}/Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
-          push: ${{ steps.login.outcome == 'success' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Generate artifact attestation
-        if: ${{ steps.login.outcome == 'success' }}
-        uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4.1.0
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}
-          subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
