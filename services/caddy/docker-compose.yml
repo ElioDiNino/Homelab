@@ -52,17 +52,45 @@ services:
   error-pages:
     image: ghcr.io/tarampampam/error-pages:3
     restart: always
-    networks:
-      - proxy-internal
     healthcheck:
       test: ["CMD", "/bin/error-pages", "healthcheck"]
       start_period: 5s
       interval: 120s
+    networks:
+      - proxy-internal
     environment:
       TEMPLATE_NAME: connection
       SEND_SAME_HTTP_CODE: true
     labels:
       diun.enable: true
+
+  sablier:
+    image: sablierapp/sablier:latest
+    restart: always
+    healthcheck:
+      test: ["CMD", "/bin/sablier", "health"]
+      start_period: 5s
+      interval: 1m30s
+    networks:
+      - proxy-internal
+      - socket-proxy-sablier
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+      SABLIER_PROVIDER_NAME: docker
+      SABLIER_PROVIDER_DOCKER_STRATEGY: stop
+      SABLIER_SESSIONS_DEFAULT_DURATION: 15m
+      SABLIER_SESSIONS_EXPIRATION_INTERVAL: 1m
+      SABLIER_LOGGING_LEVEL: ${SABLIER_LOG_LEVEL:-info}
+      SABLIER_STRATEGY_DYNAMIC_SHOW_DETAILS_BY_DEFAULT: false
+      SABLIER_STRATEGY_DYNAMIC_DEFAULT_THEME: ghost
+      SABLIER_STRATEGY_DYNAMIC_DEFAULT_REFRESH_FREQUENCY: 5s
+    labels:
+      diun.enable: true
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
+      socket-proxy.allow.get: (/v1\.\d{1,2})?/(version|containers/(json|[\w.-]+/json)(\?\S+)?|events(\?\S+)?)
+      socket-proxy.allow.post: (/v1\.\d{1,2})?/containers/[\w.-]+/(start|stop|wait|pause|unpause)(\?\S+)?
+      socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
 
   caddy-config:
     image: traefik/whoami:latest
@@ -79,6 +107,7 @@ services:
       caddy_0.acme_dns: "cloudflare {file.{$$CLOUDFLARE_API_TOKEN_FILE}}"
       caddy_0.dns: "cloudflare {file.{$$CLOUDFLARE_API_TOKEN_FILE}}"
       caddy_0.ech: "ech.{$$INTERNAL_DOMAIN}"
+      caddy_0.order: sablier before reverse_proxy
 
       # When debugging, use debug flag and staging server
       # caddy_0.debug: ""
@@ -121,6 +150,15 @@ services:
       caddy_6.@{args[0]}: host {args[0]}.{$$INTERNAL_DOMAIN}
       caddy_6.handle: "@{args[0]}"
       caddy_6.handle.{block}: ""
+
+      # Sablier template
+      # Args: group name, dynamic/blocking
+      # Block: additional Sablier configuration
+      caddy_7: (sablier)
+      caddy_7.sablier: "http://sablier:10000"
+      caddy_7.sablier.group: "{args[0]}"
+      caddy_7.sablier.{args[1]}: ""
+      caddy_7.sablier.{block}: ""
 
       #### Wildcard Definitions ####
 
@@ -247,6 +285,8 @@ networks:
   proxy-internal:
     external: true
   socket-proxy-caddy:
+    external: true
+  socket-proxy-sablier:
     external: true
   proxy-external:
     external: true

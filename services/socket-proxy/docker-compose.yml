@@ -23,6 +23,7 @@ services:
       - caddy
       - diun
       - homepage
+      - sablier
       - tinyauth
     labels:
       diun.enable: true
@@ -39,6 +40,9 @@ networks:
     internal: true
   homepage:
     name: socket-proxy-homepage
+    internal: true
+  sablier:
+    name: socket-proxy-sablier
     internal: true
   tinyauth:
     name: socket-proxy-tinyauth
