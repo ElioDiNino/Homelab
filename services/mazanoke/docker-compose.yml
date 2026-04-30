@@ -1,15 +1,23 @@
 services:
   mazanoke:
     image: ghcr.io/civilblur/mazanoke:latest
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:80/ -o /dev/null || exit 1"]
+      start_period: 30s
+      start_interval: 5s
+      interval: 30s
     networks:
       - proxy-internal
     labels:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+      sablier.enable: true
+      sablier.group: optimize
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy optimize
+      caddy.import.import: sablier optimize dynamic
       caddy.import.reverse_proxy: "{{ upstreams 80 }}"
       homepage.group: Tools
       homepage.name: Mazanoke

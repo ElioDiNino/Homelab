@@ -1,14 +1,15 @@
 services:
   convertx:
     image: ghcr.io/c4illin/convertx:latest
-    restart: always
+    restart: unless-stopped
     volumes:
       - data:/app/data
     healthcheck:
       test: curl -s -f http://localhost:3000/healthcheck -o /dev/null || exit 1
+      start_period: 30s
+      start_interval: 5s
       interval: 1m30s
       timeout: 10s
-      start_period: 10s
     environment:
       TZ: ${TIMEZONE:?error}
       ACCOUNT_REGISTRATION: false
@@ -20,8 +21,11 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+      sablier.enable: true
+      sablier.group: convert
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy convert
+      caddy.import.import: sablier convert dynamic
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
       homepage.group: Tools
       homepage.name: ConvertX

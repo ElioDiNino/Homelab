@@ -4,6 +4,10 @@ services:
     restart: always
     depends_on:
       - mongo
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://localhost:8080/ || exit 1"]
+      start_period: 20s
+      interval: 30s
     environment:
       API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
       CLIENT_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}"
@@ -37,12 +41,22 @@ services:
     restart: always
     volumes:
       - data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/your_spotify --quiet
+      start_period: 40s
+      interval: 10s
+      timeout: 5s
     networks:
       - database
 
   web:
     image: ghcr.io/yooooomi/your_spotify_client:latest
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:3000 || exit 1"]
+      start_period: 30s
+      start_interval: 5s
+      interval: 30s
     environment:
       API_ENDPOINT: "https://sd.${INTERNAL_DOMAIN:?error}/api"
     networks:
@@ -51,8 +65,11 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+      sablier.enable: true
+      sablier.group: sd
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy sd
+      caddy.import.import: sablier sd dynamic
       caddy.import.reverse_proxy: "* {{ upstreams 3000 }}"
 
 volumes:

@@ -9,9 +9,10 @@ services:
 
   stirling-pdf:
     image: ghcr.io/stirling-tools/stirling-pdf:latest
-    restart: always
+    restart: unless-stopped
     depends_on:
-      - volume_instantiation
+      volume_instantiation:
+        condition: service_completed_successfully
     volumes:
       - type: volume
         source: data
@@ -58,8 +59,12 @@ services:
       diun.enable: true
       diun.watch_repo: false
       diun.include_tags: ^latest$
+      sablier.enable: true
+      sablier.group: stirling-pdf
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy pdf
+      caddy.import.import: sablier stirling-pdf dynamic
+      caddy.import.import.session_duration: 30m
       caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
       caddy.import.header.Content-Security-Policy: >
         "
