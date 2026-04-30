@@ -6,10 +6,16 @@ services:
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD", "cloudflared", "tunnel", "--metrics", "localhost:60123", "ready"]
+      start_period: 30s
+      interval: 30s
+      timeout: 30s
     secrets:
       - tunnel_token
     environment:
       TUNNEL_TOKEN_FILE: /run/secrets/tunnel_token
+      TUNNEL_METRICS: 127.0.0.1:60123
       NO_AUTOUPDATE: true
     networks:
       - proxy-external
