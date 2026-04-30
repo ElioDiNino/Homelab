@@ -63,6 +63,7 @@ graph TB
             IMMICH_PROXY[Immich Public Proxy]
             CADDY_INT[Internal Reverse Proxy]
             ERROR_PAGES[Custom Error Pages]
+            SABLIER[Sablier]
         end
 
         subgraph "User Services"
@@ -121,6 +122,7 @@ graph TB
     CADDY_INT --> HEALTHCHECKS
     CADDY_INT --> UPTIME_KUMA
     CADDY_INT --> AIRTRAIL
+    CADDY_INT --> SABLIER
     CADDY_INT --> STIRLING
     CADDY_INT --> MAZANOKE
     CADDY_INT --> CONVERTX
@@ -133,6 +135,7 @@ graph TB
     %% Service Dependencies
     BESZEL_HUB --> BESZEL_AGENT
     CADDY_INT --> SOCKET_PROXY
+    SABLIER --> SOCKET_PROXY
     TINYAUTH --> SOCKET_PROXY
     DIUN --> SOCKET_PROXY
     BESZEL_AGENT --> SOCKET_PROXY
@@ -146,7 +149,7 @@ graph TB
     classDef infra-services fill:#ba68c8,stroke:#9c27b0,stroke-width:2px,color:#fff
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
-    class TAILSCALE,CADDY_INT,ERROR_PAGES internal
+    class TAILSCALE,CADDY_INT,ERROR_PAGES,SABLIER internal
     class IMMICH,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
@@ -159,7 +162,13 @@ graph TB
 
 ### [Caddy](./caddy/)
 
-I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due to its robust feature set and ease of use. I use a custom build that includes the [Caddy-Docker-Proxy](https://github.com/lucaslorentz/caddy-docker-proxy) and [Cloudflare DNS](https://github.com/caddy-dns/cloudflare) plugins for label-based configuration and automatic SSL certificate management.
+I use [Caddy](https://caddyserver.com/) as the reverse proxy for my services due to its robust feature set and ease of use. I use a custom build that includes the [Caddy Docker Proxy](https://github.com/lucaslorentz/caddy-docker-proxy) and [Cloudflare DNS](https://github.com/caddy-dns/cloudflare) plugins for label-based configuration and automatic SSL certificate management.
+
+#### Sablier
+
+Additionally, I use [Sablier](https://sablierapp.dev/) along with [its Caddy plugin](https://github.com/sablierapp/sablier-caddy-plugin) to automatically scale down user tools (i.e. services that are used for short periods and don't perform background tasks) when not in use and scale them back up when needed, which helps save system resources.
+
+#### Error Pages
 
 I also use [Error Pages](https://github.com/tarampampam/error-pages) to provide custom error pages for my services, resulting in more user-friendly error information.
 
