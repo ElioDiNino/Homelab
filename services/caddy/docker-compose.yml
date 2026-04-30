@@ -1,7 +1,7 @@
 services:
   caddy:
     image: ghcr.io/eliodinino/homelab/caddy:latest
-    build: .
+    # build: . # Uncomment for local development
     restart: always
     volumes:
       - data:/data
