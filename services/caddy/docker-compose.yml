@@ -12,6 +12,11 @@ services:
       - 443:443/udp
     cap_add:
       - NET_ADMIN
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:2019/metrics || exit 1"]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m30s
     networks:
       - proxy-internal
       - socket-proxy-caddy
@@ -216,6 +221,11 @@ services:
     volumes:
       - data-external:/data
       - config-external:/config
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O - http://127.0.0.1:2019/metrics || exit 1"]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m30s
     networks:
       - proxy-external
       - proxy-plausible
