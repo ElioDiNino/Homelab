@@ -24,7 +24,7 @@ services:
       - uploads:/tmp/airtrail-uploads
 
   airtrail:
-    image: johly/airtrail:latest
+    image: johly/airtrail:v3
     restart: always
     depends_on:
       db:
@@ -53,8 +53,6 @@ services:
       - database
     labels:
       diun.enable: true
-      diun.watch_repo: false
-      diun.include_tags: ^latest$
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy airtrail
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
