@@ -55,17 +55,17 @@ services:
       homepage.weight: 2
 
   error-pages:
-    image: ghcr.io/tarampampam/error-pages:3
+    image: ghcr.io/tarampampam/error-pages:4
     restart: always
     healthcheck:
-      test: ["CMD", "/bin/error-pages", "healthcheck"]
-      start_period: 5s
-      interval: 120s
+      disable: false
     networks:
       - proxy-internal
     environment:
       TEMPLATE_NAME: connection
       SEND_SAME_HTTP_CODE: true
+      HOMEPAGE_URL: https://${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+      ADD_LINK: Status Page=https://status.${INTERNAL_DOMAIN:?error}/status/
     labels:
       diun.enable: true
 
@@ -141,8 +141,8 @@ services:
       # Pretty error pages
       caddy_4: (error_pages)
       caddy_4.handle_errors: ""
+      caddy_4.handle_errors.rewrite: "* /{err.status_code}"
       caddy_4.handle_errors.reverse_proxy: "error-pages:8080"
-      caddy_4.handle_errors.reverse_proxy.header_up: X-Code {err.status_code}
 
       # Default 404 response
       caddy_5: (default_404)
