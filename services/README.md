@@ -20,6 +20,7 @@ docker network create proxy-internal --ipv6
 docker network create proxy-external --ipv6
 docker network create proxy-plausible --internal
 docker network create proxy-immich-public --internal
+docker network create proxy-immich-upload-public --internal
 docker network create proxy-ottrbox --internal
 docker compose up -d
 ```
@@ -105,6 +106,7 @@ graph TB
     %% External Service Routing
     CADDY_EXT --> OTTRBOX
     CADDY_EXT --> IMMICH_PROXY
+    CADDY_EXT --> IMMICH
     IMMICH_PROXY --> IMMICH
     CADDY_EXT --> PLAUSIBLE
 
