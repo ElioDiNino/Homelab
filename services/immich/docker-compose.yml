@@ -29,6 +29,7 @@ services:
       - frontend
       - backend
       - proxy-internal
+      - proxy-immich-upload-public
     labels:
       diun.enable: true
       caddy: "{$$WILDCARD_INTERNAL}"
@@ -180,4 +181,6 @@ networks:
   proxy-internal:
     external: true
   proxy-immich-public:
+    external: true
+  proxy-immich-upload-public:
     external: true

@@ -231,12 +231,14 @@ services:
       - proxy-external
       - proxy-plausible
       - proxy-immich-public
+      - proxy-immich-upload-public
       - proxy-ottrbox
     environment:
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
       INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
+      IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN: ${IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN:?error}
       OTTRBOX_EXTERNAL_SUBDOMAIN: ${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}
     labels:
       diun.enable: true
@@ -274,6 +276,43 @@ configs:
         }
       }
 
+      {$$IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+        @external `
+          (
+            method('GET') &&
+            (
+              path('/share/*') ||
+              path('/api/server/config') ||
+              path('/api/server/features') ||
+              path('/api/server/media-types') ||
+              path('/api/shared-links/me') ||
+              path('/api/albums/*') ||
+              path('/api/assets/*') ||
+              path('/api/timeline/bucket') ||
+              path('/api/timeline/buckets') ||
+              path('/_app/*') ||
+              path('/custom.css') ||
+              path('/dark_skeleton.png') ||
+              path('/manifest.json') ||
+              path('/favicon.ico')
+            )
+          ) || (
+            method('POST') &&
+            (
+              path('/api/download/*') ||
+              path('/api/assets')
+            )
+          )
+        `
+        handle @external {
+          reverse_proxy immich-server:2283
+        }
+
+        handle {
+          redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
+        }
+      }
+
       {$$OTTRBOX_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
         reverse_proxy ottrbox:3000
       }
@@ -304,6 +343,8 @@ networks:
   proxy-plausible:
     external: true
   proxy-immich-public:
+    external: true
+  proxy-immich-upload-public:
     external: true
   proxy-ottrbox:
     external: true
