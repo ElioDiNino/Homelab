@@ -68,37 +68,26 @@ services:
               "Cache-Control": "public, max-age=2592000",
               "Access-Control-Allow-Origin":  "*"
             },
-            "singleImageGallery": true,
-            "singleItemAutoOpen": true,
             "downloadOriginalPhoto": true,
             "downloadedFilename": 2,
             "allowDownloadAll": 1,
             "allowSlugLinks": false,
             "showHomePage": true,
-            "showGalleryTitle": true,
-            "showGalleryDescription": true,
             "showMetadata": {
               "description": true
             },
-            "customInvalidResponse": false
-          },
-          "lightGallery": {
-            "controls": true,
-            "download": true,
-            "loop": false,
-            "customSlideName": true,
-            "allowMediaOverlap": true,
-
-            "thumbnail": true,
-            "toggleThumb": true,
-
-            "autoplayFirstVideo": false,
-            "gotoNextSlideOnVideoEnd": false,
-
-            "mobileSettings": {
-              "controls": false,
-              "showCloseIcon": true,
-              "download": true
+            "customInvalidResponse": false,
+            "gallery": {
+              "singleImage": true,
+              "singleItemAutoOpen": true,
+              "showTitle": true,
+              "showDescription": true,
+              "groupByDate": true
+            },
+            "lightbox": {
+              "showArrows": true,
+              "showDownload": true,
+              "mobileArrows": false
             }
           }
         }
