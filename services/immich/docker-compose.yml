@@ -49,7 +49,7 @@ services:
       homepage.widget.hideErrors: true
 
   immich-public-proxy:
-    image: ghcr.io/alangrainger/immich-public-proxy:latest
+    image: ghcr.io/alangrainger/immich-public-proxy:2
     restart: always
     depends_on:
       immich-server:
@@ -96,8 +96,6 @@ services:
       - proxy-immich-public
     labels:
       diun.enable: true
-      diun.watch_repo: false
-      diun.include_tags: ^latest$
 
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:v2
