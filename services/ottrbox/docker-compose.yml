@@ -35,7 +35,7 @@ configs:
         allowUnauthenticatedShares: "false"
         maxExpiration: 1 month
         shareIdLength: "12"
-        maxSize: "1000000000" # 1 GB
+        maxSize: "${OTTRBOX_MAX_SHARE_BYTES:-1000000000}" # 1 GB default
         zipCompressionLevel: "9"
         chunkSize: "10000000" # 10 MB
         autoOpenShareModal: "false"
