@@ -8,6 +8,7 @@ services:
     secrets:
       - discord_webhook_url
       - gotify_token
+      - healthchecks_uuid
     environment:
       TZ: ${TIMEZONE:?error}
       DIUN_WATCH_SCHEDULE: 0 7,17 * * * # 7 AM and 5 PM daily
@@ -19,7 +20,7 @@ services:
       DIUN_DEFAULTS_SORTTAGS: semver
       DIUN_DEFAULTS_INCLUDETAGS: ^v?\d+$
       DIUN_WATCH_HEALTHCHECKS_BASEURL: https://healthchecks.${INTERNAL_DOMAIN:?error}/ping
-      DIUN_WATCH_HEALTHCHECKS_UUID: ${DIUN_HEALTHCHECKS_UUID:?error}
+      DIUN_WATCH_HEALTHCHECKS_UUIDFILE: /run/secrets/healthchecks_uuid
       DIUN_NOTIF_DISCORD_WEBHOOKURLFILE: /run/secrets/discord_webhook_url
       DIUN_NOTIF_GOTIFY_ENDPOINT: "https://gotify.${INTERNAL_DOMAIN:?error}"
       DIUN_NOTIF_GOTIFY_TOKENFILE: /run/secrets/gotify_token
@@ -36,6 +37,8 @@ secrets:
     environment: DISCORD_WEBHOOK_URL
   gotify_token:
     environment: DIUN_GOTIFY_TOKEN
+  healthchecks_uuid:
+    environment: DIUN_HEALTHCHECKS_UUID
 
 volumes:
   data:
