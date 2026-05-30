@@ -5,6 +5,12 @@ services:
     command: serve
     volumes:
       - data:/data
+    healthcheck:
+      test: ["CMD", "diun", "healthcheck"]
+      start_period: 60s
+      interval: 30s
+      timeout: 5s
+      retries: 3
     secrets:
       - discord_webhook_url
       - gotify_token
