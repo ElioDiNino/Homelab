@@ -33,6 +33,10 @@ services:
       homepage.href: https://convert.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: File converter
       homepage.weight: 200
+    deploy:
+      resources:
+        limits:
+          memory: ${CONVERTX_MEMORY_LIMIT:?error}
 
 volumes:
   data:
