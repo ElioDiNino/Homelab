@@ -74,7 +74,30 @@ services:
             "allowSlugLinks": false,
             "showHomePage": true,
             "showMetadata": {
-              "description": true
+              "description": {
+                "caption": true,
+                "sidebar": true
+              },
+              "exif": {
+                "dateTimeOriginal": true,
+                "fileName": false,
+                "dimensions": true,
+                "fileSize": true,
+                "make": true,
+                "model": true,
+                "lensModel": true,
+                "exposureTime": true,
+                "iso": true,
+                "fNumber": true,
+                "focalLength": true
+              },
+              "location": {
+                "city": true,
+                "state": true,
+                "country": true,
+                "gps": true,
+                "webLink": true
+              }
             },
             "customInvalidResponse": false,
             "gallery": {
