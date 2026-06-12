@@ -110,7 +110,8 @@ services:
             "lightbox": {
               "showArrows": true,
               "showDownload": true,
-              "mobileArrows": false
+              "mobileArrows": false,
+              "autoPlayVideos": false
             }
           }
         }
