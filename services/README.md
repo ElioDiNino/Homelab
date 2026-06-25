@@ -69,6 +69,7 @@ graph TB
 
         subgraph "User Services"
             IMMICH[Immich]
+            NEXTCLOUD[Nextcloud]
             PLAUSIBLE[Plausible]
             OTTRBOX[OttrBox]
             HOMEPAGE[Homepage]
@@ -117,6 +118,7 @@ graph TB
     %% Internal Service Routing
     CADDY_INT --> ERROR_PAGES
     CADDY_INT --> IMMICH
+    CADDY_INT --> NEXTCLOUD
     CADDY_INT --> PLAUSIBLE
     CADDY_INT --> HOMEPAGE
     CADDY_INT --> POCKET_ID
@@ -152,7 +154,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES,SABLIER internal
-    class IMMICH,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,NEXTCLOUD,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -211,6 +213,10 @@ Due to some services' reliance on connection to the docker socket, I use [Docker
 [Immich](https://immich.app/) is a self-hosted photo and video storage solution with functionality similar to Google Photos. It allows you to automatically back up your photos and videos from your devices, providing a web interface to view and manage your media. It is my primary photo and video management solution.
 
 I also run [Immich Public Proxy](https://github.com/alangrainger/immich-public-proxy) to provide secure external access to link shares and public albums without exposing the main Immich server directly to the internet.
+
+### [Nextcloud](./nextcloud/)
+
+[Nextcloud](https://nextcloud.com/) is a powerful productivity platform that provides file storage, collaboration tools, and more. I use it mainly to store and share files.
 
 ### [Cloudflared](./cloudflared/)
 

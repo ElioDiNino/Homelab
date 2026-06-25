@@ -1,0 +1,373 @@
+x-restart-policy: &restart_policy
+  restart: always
+x-read_only: &read_only
+  read_only: true
+x-init: &init
+  init: true
+x-depends_on-healthy: &depends_on-healthy
+  condition: service_healthy
+x-depends_on-started: &depends_on-started
+  condition: service_started
+x-cap_drop: &cap_drop
+  cap_drop:
+    - NET_RAW
+x-healthcheck-defaults: &healthcheck_defaults
+  test: /healthcheck.sh
+  start_period: 0s
+  start_interval: 5s
+  interval: 30s
+  timeout: 30s
+  retries: 3
+x-environment-defaults: &environment_defaults
+  TZ: ${TIMEZONE:?error}
+  AIO_LOG_LEVEL: ${NEXTCLOUD_LOG_LEVEL:-warn}
+x-environment-domain: &environment_domain
+  NC_DOMAIN: &nextcloud_domain cloud.${INTERNAL_DOMAIN:?error}
+x-environment-hosts: &environment_hosts
+  NEXTCLOUD_HOST: nextcloud
+  POSTGRES_HOST: database
+  REDIS_HOST: redis
+  APACHE_HOST: apache
+  COLLABORA_HOST: collabora
+  IMAGINARY_HOST: imaginary
+  FULLTEXTSEARCH_HOST: fulltextsearch
+  NOTIFY_PUSH_HOST: notify-push
+  WHITEBOARD_HOST: whiteboard
+x-environment-postgres: &environment_postgres
+  POSTGRES_DB: nextcloud_database
+  POSTGRES_USER: nextcloud
+  POSTGRES_PASSWORD: ${NEXTCLOUD_DATABASE_PASSWORD:?error}
+x-labels-diun: &labels-diun
+  diun.enable: true
+  diun.watch_repo: false
+  diun.include_tags: ^latest$
+
+services:
+  apache:
+    image: ghcr.io/nextcloud-releases/aio-apache:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "33"
+    depends_on:
+      nextcloud:
+        <<: *depends_on-started
+      collabora:
+        <<: *depends_on-healthy
+      notify-push:
+        <<: *depends_on-started
+      whiteboard:
+        <<: *depends_on-healthy
+    volumes:
+      - apache:/mnt/data:rw
+      - nextcloud:/var/www/html:ro
+    tmpfs:
+      - /var/log/supervisord
+      - /var/run/supervisord
+      - /usr/local/apache2/logs
+      - /tmp
+      - /home/www-data
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: [*environment_defaults, *environment_domain, *environment_hosts]
+      APACHE_PORT: &apache_port 8080
+      APACHE_MAX_SIZE: 10737418240 # Integer in sync with PHP_UPLOAD_LIMIT
+      APACHE_MAX_TIME: 3600
+    networks:
+      - nextcloud
+      - notify-push
+      - collabora
+      - whiteboard
+      - proxy-internal
+    labels:
+      <<: *labels-diun
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy cloud
+      caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
+      homepage.group: Media
+      homepage.name: Nextcloud
+      homepage.icon: nextcloud
+      homepage.href: https://cloud.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.description: File storage and office suite
+      homepage.weight: 10
+
+  database:
+    image: ghcr.io/nextcloud-releases/aio-postgresql:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "999"
+    stop_grace_period: 1800s
+    shm_size: 268435456
+    volumes:
+      - database:/var/lib/postgresql/data:rw
+      - database_dump:/mnt/data:rw
+    tmpfs:
+      - /var/run/postgresql
+    expose:
+      - "5432"
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: [*environment_defaults, *environment_postgres]
+      PGTZ: ${TIMEZONE:?error}
+    networks:
+      - database
+    labels:
+      <<: *labels-diun
+
+  nextcloud:
+    image: ghcr.io/nextcloud-releases/aio-nextcloud:latest
+    <<: [*restart_policy, *cap_drop, *init]
+    stop_grace_period: 600s
+    shm_size: 134217728
+    depends_on:
+      database:
+        <<: *depends_on-healthy
+      redis:
+        <<: *depends_on-healthy
+      fulltextsearch:
+        <<: *depends_on-started
+      imaginary:
+        <<: *depends_on-healthy
+    volumes:
+      - nextcloud:/var/www/html:rw
+      - nextcloud_data:/mnt/ncdata:rw
+    expose:
+      - "9000"
+      - "9001"
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: [*environment_defaults, *environment_domain, *environment_hosts, *environment_postgres]
+      INSTALL_LATEST_MAJOR: "yes"
+      NEXTCLOUD_DATA_DIR: /mnt/ncdata
+      NEXTCLOUD_DEFAULT_QUOTA: ${NEXTCLOUD_DEFAULT_QUOTA:-10G}
+      NEXTCLOUD_SKELETON_DIRECTORY: "empty" # Disables the skeleton directory
+      NEXTCLOUD_MAINTENANCE_WINDOW: 10 # 3 AM PDT
+      ADMIN_USER: admin
+      ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD:?error}
+      OVERWRITEHOST: *nextcloud_domain
+      OVERWRITEPROTOCOL: https
+      ADDITIONAL_TRUSTED_PROXY: 172.16.0.0/12
+      PHP_UPLOAD_LIMIT: 10G
+      PHP_MEMORY_LIMIT: 512M
+      PHP_MAX_TIME: 3600
+      POSTGRES_PORT: 5432
+      REDIS_PORT: &redis_port 6379
+      REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD:?error}
+      APACHE_PORT: *apache_port
+      SMTP_HOST: ${SMTP_HOST_ADDR:?error}
+      SMTP_SECURE: ${SMTP_HOST_SECURE:?error}
+      SMTP_PORT: ${SMTP_HOST_PORT:?error}
+      SMTP_NAME: ${SMTP_USER_NAME:?error}
+      SMTP_PASSWORD: ${SMTP_USER_PWD:?error}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:?error}
+      MAIL_DOMAIN: ${MAIL_DOMAIN:?error}
+      UPDATE_NEXTCLOUD_APPS: "yes"
+      REMOVE_DISABLED_APPS: "yes"
+      STARTUP_APPS: "contacts encryption end_to_end_encryption files_retention groupfolders quota_warning suspicious_login twofactor_nextcloud_notification twofactor_totp twofactor_webauthn user_oidc -dashboard -nextcloud_announcements -photos -privacy -recommendations -support -survey_client -user_status -webhook_listeners -weather_status"
+      ADDITIONAL_APKS: imagemagick
+      ADDITIONAL_PHP_EXTENSIONS: imagick
+
+      COLLABORA_ENABLED: "yes"
+      ONLYOFFICE_ENABLED: "no"
+      EUROOFFICE_ENABLED: "no"
+      TALK_ENABLED: "no"
+      TALK_RECORDING_ENABLED: "no"
+      CLAMAV_ENABLED: "no"
+      IMAGINARY_ENABLED: "yes"
+      FULLTEXTSEARCH_ENABLED: "yes"
+      WHITEBOARD_ENABLED: "yes"
+
+      COLLABORA_HOST: *nextcloud_domain # Different due to changed container name
+      IMAGINARY_SECRET: ${NEXTCLOUD_IMAGINARY_SECRET:?error}
+      FULLTEXTSEARCH_PROTOCOL: http
+      FULLTEXTSEARCH_PORT: 9200
+      FULLTEXTSEARCH_USER: elastic
+      FULLTEXTSEARCH_INDEX: nextcloud-aio
+      FULLTEXTSEARCH_PASSWORD: ${NEXTCLOUD_FULLTEXTSEARCH_PASSWORD:?error}
+      WHITEBOARD_SECRET: ${NEXTCLOUD_WHITEBOARD_SECRET:?error}
+    networks:
+      - nextcloud
+      - database
+      - redis
+      - notify-push
+      - collabora
+      - imaginary
+      - fulltextsearch
+      - whiteboard
+    labels:
+      <<: *labels-diun
+
+  notify-push:
+    image: ghcr.io/nextcloud-releases/aio-notify-push:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "33"
+    volumes:
+      - nextcloud:/var/www/html:ro
+    expose:
+      - "7867"
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: [*environment_defaults, *environment_hosts]
+    networks:
+      - notify-push
+      - database
+      - redis
+    labels:
+      <<: *labels-diun
+
+  redis:
+    image: ghcr.io/nextcloud-releases/aio-redis:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "999"
+    volumes:
+      - redis:/data:rw
+    expose:
+      - "6379"
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: *environment_defaults
+      REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD:?error}
+    networks:
+      - redis
+    labels:
+      <<: *labels-diun
+
+  collabora:
+    image: ghcr.io/nextcloud-releases/aio-collabora:latest
+    <<: [*restart_policy, *cap_drop, *init]
+    command: ['--o:security.seccomp=true']
+    shm_size: 268435456
+    tmpfs:
+      - /tmp
+    expose:
+      - "9980"
+    cap_add:
+      - SYS_ADMIN
+      - SYS_CHROOT
+      - FOWNER
+      - CHOWN
+    healthcheck:
+      <<: *healthcheck_defaults
+      start_period: 60s
+      retries: 9
+    environment:
+      <<: *environment_defaults
+      aliasgroup1: https://cloud.${INTERNAL_DOMAIN:?error}:443,http://apache.nextcloud-aio:23973
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:logging.disable_server_audit=true --o:welcome.enable=false --o:fetch_update_check=0 --o:allow_update_popup=false --o:remote_font_config.url=https://cloud.${INTERNAL_DOMAIN:?error}/apps/richdocuments/settings/fonts.json --o:net.post_allow.host[0]=.+
+      dictionaries: "de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT"
+      server_name: *nextcloud_domain
+      DONT_GEN_SSL_CERT: 1
+    networks:
+      - collabora
+    labels:
+      <<: *labels-diun
+
+  imaginary:
+    image: ghcr.io/nextcloud-releases/aio-imaginary:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "65534"
+    tmpfs:
+      - /tmp
+    expose:
+      - "9000"
+    cap_add:
+      - SYS_NICE
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: *environment_defaults
+      IMAGINARY_SECRET: ${NEXTCLOUD_IMAGINARY_SECRET:?error}
+    networks:
+      - imaginary
+    labels:
+      <<: *labels-diun
+
+  fulltextsearch:
+    image: ghcr.io/nextcloud-releases/aio-fulltextsearch:latest
+    <<: [*restart_policy, *cap_drop]
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data:rw
+    expose:
+      - "9200"
+    healthcheck:
+      <<: *healthcheck_defaults
+      start_period: 60s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      <<: *environment_defaults
+      ES_JAVA_OPTS: "-Xms512M -Xmx512M"
+      bootstrap.memory_lock: false
+      cluster.name: nextcloud-aio
+      discovery.type: single-node
+      http.port: 9200
+      xpack.license.self_generated.type: basic
+      xpack.security.enabled: true
+      xpack.security.http.ssl.enabled: false
+      xpack.security.transport.ssl.enabled: false
+      indices.fielddata.cache.size: 20%
+      indices.memory.index_buffer_size: 20%
+      thread_pool.write.queue_size: 1000
+      ELASTIC_PASSWORD: ${NEXTCLOUD_FULLTEXTSEARCH_PASSWORD:?error}
+    networks:
+      - fulltextsearch
+    labels:
+      <<: *labels-diun
+
+  whiteboard:
+    image: ghcr.io/nextcloud-releases/aio-whiteboard:latest
+    <<: [*restart_policy, *cap_drop, *read_only, *init]
+    user: "65534"
+    tmpfs:
+      - /tmp
+    expose:
+      - "3002"
+    healthcheck:
+      <<: *healthcheck_defaults
+    environment:
+      <<: [*environment_defaults, *environment_hosts]
+      NEXTCLOUD_URL: https://cloud.${INTERNAL_DOMAIN:?error}
+      JWT_SECRET_KEY: ${NEXTCLOUD_WHITEBOARD_SECRET:?error}
+      STORAGE_STRATEGY: redis
+      REDIS_PORT: *redis_port
+      REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD:?error}
+      BACKUP_DIR: /tmp
+    networks:
+      - whiteboard
+      - redis
+    labels:
+      <<: *labels-diun
+
+volumes:
+  apache:
+  database:
+  database_dump:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: //${HEXOS_HOST:?error}/${NEXTCLOUD_HEXOS_BACKUP_FOLDER:-Backups/nextcloud}
+      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=999,gid=999,vers=3.0
+  nextcloud:
+  nextcloud_data:
+    driver: local
+    driver_opts:
+      type: cifs
+      device: //${HEXOS_HOST:?error}/${NEXTCLOUD_HEXOS_FOLDER:-Nextcloud}
+      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=33,gid=0,vers=3.0
+  redis:
+  elasticsearch:
+
+networks:
+  nextcloud:
+  database:
+  redis:
+  notify-push:
+  collabora:
+  imaginary:
+  fulltextsearch:
+  whiteboard:
+  proxy-internal:
+    external: true
