@@ -18,16 +18,17 @@ services:
       - source: custom-css
         target: /app/config/custom.css
     secrets:
+      - airtrail-api-key
       - beszel-username
       - beszel-password
       - gotify-api-token
       - healthchecks-api-key
       - immich-api-key
+      - nextcloud-serverinfo-token
       - portainer-api-key
       - proxmox-api-token
       - proxmox-api-secret
       - truenas-api-key
-      - airtrail-api-key
     environment:
       HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
       HOMEPAGE_VAR_EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
@@ -41,6 +42,7 @@ services:
       HOMEPAGE_FILE_GOTIFY_API_TOKEN: /run/secrets/gotify-api-token
       HOMEPAGE_FILE_HEALTHCHECKS_API_KEY: /run/secrets/healthchecks-api-key
       HOMEPAGE_FILE_IMMICH_API_KEY: /run/secrets/immich-api-key
+      HOMEPAGE_FILE_NEXTCLOUD_SERVERINFO_TOKEN: /run/secrets/nextcloud-serverinfo-token
       HOMEPAGE_FILE_PORTAINER_API_KEY: /run/secrets/portainer-api-key
       HOMEPAGE_FILE_PROXMOX_API_TOKEN: /run/secrets/proxmox-api-token
       HOMEPAGE_FILE_PROXMOX_API_SECRET: /run/secrets/proxmox-api-secret
@@ -420,6 +422,8 @@ secrets:
     environment: HOMEPAGE_HEALTHCHECKS_API_KEY
   immich-api-key:
     environment: HOMEPAGE_IMMICH_API_KEY
+  nextcloud-serverinfo-token:
+    environment: HOMEPAGE_NEXTCLOUD_SERVERINFO_TOKEN
   portainer-api-key:
     environment: HOMEPAGE_PORTAINER_API_KEY
   proxmox-api-token:

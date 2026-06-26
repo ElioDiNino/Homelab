@@ -85,10 +85,14 @@ services:
       caddy.import.reverse_proxy: "{{ upstreams 8080 }}"
       homepage.group: Media
       homepage.name: Nextcloud
-      homepage.icon: nextcloud
+      homepage.icon: sh-nextcloud
       homepage.href: https://cloud.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: File storage and office suite
       homepage.weight: 10
+      homepage.widget.type: nextcloud
+      homepage.widget.url: https://cloud.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.widget.key: "{{HOMEPAGE_FILE_NEXTCLOUD_SERVERINFO_TOKEN}}"
+      homepage.widget.fields: '["numfiles", "numshares"]'
 
   database:
     image: ghcr.io/nextcloud-releases/aio-postgresql:latest
@@ -154,6 +158,7 @@ services:
       REDIS_PORT: &redis_port 6379
       REDIS_HOST_PASSWORD: ${NEXTCLOUD_REDIS_PASSWORD:?error}
       APACHE_PORT: *apache_port
+      SERVERINFO_TOKEN: ${NEXTCLOUD_SERVERINFO_TOKEN:?error}
       SMTP_HOST: ${SMTP_HOST_ADDR:?error}
       SMTP_SECURE: ${SMTP_HOST_SECURE:?error}
       SMTP_PORT: ${SMTP_HOST_PORT:?error}
