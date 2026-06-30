@@ -49,7 +49,7 @@ services:
       homepage.widget.hideErrors: true
 
   immich-public-proxy:
-    image: ghcr.io/alangrainger/immich-public-proxy:2
+    image: ghcr.io/alangrainger/immich-public-proxy:3
     restart: always
     depends_on:
       immich-server:
@@ -68,9 +68,11 @@ services:
               "Cache-Control": "public, max-age=2592000",
               "Access-Control-Allow-Origin":  "*"
             },
-            "downloadOriginalPhoto": true,
+            "maxDownloadQuality": "original",
+            "maxZoomQuality": "fullsize",
             "downloadedFilename": 2,
-            "allowDownloadAll": 1,
+            "allowDownload": 1,
+            "downloadFromImmichConcurrencyLimit": 10,
             "allowSlugLinks": false,
             "showHomePage": true,
             "showMetadata": {
