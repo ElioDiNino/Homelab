@@ -141,7 +141,7 @@ services:
       <<: *healthcheck_defaults
     environment:
       <<: [*environment_defaults, *environment_domain, *environment_hosts, *environment_postgres]
-      INSTALL_LATEST_MAJOR: "yes"
+      INSTALL_LATEST_MAJOR: "no"
       NEXTCLOUD_DATA_DIR: /mnt/ncdata
       NEXTCLOUD_DEFAULT_QUOTA: ${NEXTCLOUD_DEFAULT_QUOTA:-10G}
       NEXTCLOUD_SKELETON_DIRECTORY: "empty" # Disables the skeleton directory
