@@ -302,6 +302,7 @@ configs:
           ) || (
             method('POST') &&
             (
+              path('/api/shared-links/login') ||
               path('/api/download/*') ||
               path('/api/assets')
             )
