@@ -1,6 +1,6 @@
 services:
   immich-server:
-    image: ghcr.io/immich-app/immich-server:v2
+    image: ghcr.io/immich-app/immich-server:v3
     restart: always
     depends_on:
       - redis
@@ -124,7 +124,7 @@ services:
       diun.enable: true
 
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v2
+    image: ghcr.io/immich-app/immich-machine-learning:v3
     restart: always
     volumes:
       - model-cache:/cache
@@ -141,7 +141,7 @@ services:
           memory: ${IMMICH_ML_MEMORY_LIMIT:?error}
 
   redis:
-    image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
+    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
     restart: always
     healthcheck:
       test: valkey-cli ping || exit 1
