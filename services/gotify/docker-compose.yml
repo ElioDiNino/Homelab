@@ -1,11 +1,25 @@
 services:
   gotify:
-    image: ghcr.io/gotify/server:2
+    image: ghcr.io/gotify/server:3
     restart: always
     volumes:
       - data:/app/data
+    secrets:
+      - oidc_clientsecret
     environment:
       TZ: ${TIMEZONE:?error}
+      GOTIFY_LOG_LEVEL: ${GOTIFY_LOG_LEVEL:-info}
+      GOTIFY_SERVER_TRUSTEDPROXIES: 172.16.0.0/12
+      GOTIFY_SECURECOOKIE: true
+      GOTIFY_OIDC_ENABLED: true
+      GOTIFY_OIDC_ISSUER: https://id.${INTERNAL_DOMAIN:?error}
+      GOTIFY_OIDC_CLIENTID: ${GOTIFY_OIDC_CLIENTID:?error}
+      GOTIFY_OIDC_CLIENTSECRET_FILE: /run/secrets/oidc_clientsecret
+      GOTIFY_OIDC_REDIRECTURL: https://gotify.${INTERNAL_DOMAIN:?error}/auth/oidc/callback
+      GOTIFY_OIDC_AUTOREGISTER: false
+      GOTIFY_OIDC_LINK_BY_USERNAME: true
+      GOTIFY_OIDC_USERNAMECLAIM: gotify_user # Map all allowed users to the same Gotify user
+      GOTIFY_OIDC_SCOPES: openid,profile,email,groups
     networks:
       - proxy-internal
     labels:
@@ -23,6 +37,10 @@ services:
       homepage.widget.url: https://gotify.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.widget.key: "{{HOMEPAGE_FILE_GOTIFY_API_TOKEN}}"
       homepage.widget.fields: '["messages"]'
+
+secrets:
+  oidc_clientsecret:
+    environment: GOTIFY_OIDC_CLIENTSECRET
 
 volumes:
   data:
