@@ -1,6 +1,6 @@
 services:
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v5
+    image: ghcr.io/tinyauthapp/tinyauth:v5
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -14,6 +14,7 @@ services:
       TINYAUTH_RESOURCES_ENABLED: false
       TINYAUTH_AUTH_SECURECOOKIE: true
       TINYAUTH_AUTH_SESSIONEXPIRY: ${TINYAUTH_SESSION_EXPIRY:-14400} # 4 hours by default
+      TINYAUTH_AUTH_TRUSTEDPROXIES: 172.16.0.0/12
       TINYAUTH_OAUTH_AUTOREDIRECT: pocketid
       TINYAUTH_OAUTH_PROVIDERS_POCKETID_NAME: Pocket ID
       TINYAUTH_OAUTH_PROVIDERS_POCKETID_CLIENTID: ${TINYAUTH_CLIENT_ID:?error}
