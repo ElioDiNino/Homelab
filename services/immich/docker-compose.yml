@@ -82,6 +82,7 @@ services:
               },
               "exif": {
                 "dateTimeOriginal": true,
+                "timeZone": true,
                 "fileName": false,
                 "dimensions": true,
                 "fileSize": true,
@@ -104,10 +105,16 @@ services:
             "customInvalidResponse": false,
             "gallery": {
               "singleImage": true,
+              "singleVideo": true,
               "singleItemAutoOpen": true,
               "showTitle": true,
               "showDescription": true,
-              "groupByDate": true
+              "showExpiryDate": true,
+              "expiryDateFormat": "MMM D, YYYY [at] h:mm A",
+              "expiryDateLocale": "en-ca",
+              "groupByDate": "day",
+              "showDownloadZip": true,
+              "cacheTime": 300
             },
             "lightbox": {
               "showArrows": true,
