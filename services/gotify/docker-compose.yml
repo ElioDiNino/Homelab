@@ -1,6 +1,6 @@
 services:
   gotify:
-    image: ghcr.io/gotify/server:2
+    image: ghcr.io/gotify/server:3
     restart: always
     volumes:
       - data:/app/data
