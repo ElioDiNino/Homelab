@@ -14,7 +14,7 @@ services:
       caddy.import.reverse_proxy: "{{ upstreams 3001 }}"
       tinyauth.apps.uptime-kuma.config.domain: status.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.uptime-kuma.oauth.groups: admins
-      tinyauth.apps.uptime-kuma.path.allow: ^/(status/|assets/|upload/|icon.svg|api/(push/|badge/|status-page/))
+      tinyauth.apps.uptime-kuma.path.allow: ^\/(status(\/|$)|icon\.svg$|(assets|upload|api\/(push|badge|status-page))\/)
       homepage.group: Monitoring
       homepage.name: Uptime Kuma
       homepage.icon: uptime-kuma
