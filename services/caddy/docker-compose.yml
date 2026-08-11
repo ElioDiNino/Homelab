@@ -319,7 +319,7 @@ configs:
       }
 
       {$$PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-        @external path /upload/* /s/* /share/* /api/shares /api/shares/* /api/reverseShares/* /_next/static/* /img/* /manifest.json /favicon.ico
+        @external path /upload/* /s/* /share/* /api/shares /api/shares/* /api/reverseShares/* /_next/data/* /_next/static/* /img/* /manifest.json /favicon.ico
         handle @external {
           reverse_proxy pingvin-share-x:3000
         }
