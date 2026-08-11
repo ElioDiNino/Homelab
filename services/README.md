@@ -21,7 +21,7 @@ docker network create proxy-external --ipv6
 docker network create proxy-plausible --internal
 docker network create proxy-immich-public --internal
 docker network create proxy-immich-upload-public --internal
-docker network create proxy-ottrbox --internal
+docker network create proxy-pingvin-share-x --internal
 docker compose up -d
 ```
 
@@ -71,7 +71,7 @@ graph TB
             IMMICH[Immich]
             NEXTCLOUD[Nextcloud]
             PLAUSIBLE[Plausible]
-            OTTRBOX[OttrBox]
+            PINGVIN_SHARE_X[Pingvin Share X]
             HOMEPAGE[Homepage]
             POCKET_ID[Pocket ID]
             GOTIFY[Gotify]
@@ -105,11 +105,11 @@ graph TB
     CF_TUNNEL --> CADDY_EXT
 
     %% External Service Routing
-    CADDY_EXT --> OTTRBOX
     CADDY_EXT --> IMMICH_PROXY
     CADDY_EXT --> IMMICH
     IMMICH_PROXY --> IMMICH
     CADDY_EXT --> PLAUSIBLE
+    CADDY_EXT --> PINGVIN_SHARE_X
 
     %% Internal Access
     INT --> TAILSCALE
@@ -118,8 +118,9 @@ graph TB
     %% Internal Service Routing
     CADDY_INT --> ERROR_PAGES
     CADDY_INT --> IMMICH
-    CADDY_INT --> NEXTCLOUD
     CADDY_INT --> PLAUSIBLE
+    CADDY_INT --> PINGVIN_SHARE_X
+    CADDY_INT --> NEXTCLOUD
     CADDY_INT --> HOMEPAGE
     CADDY_INT --> POCKET_ID
     CADDY_INT --> GOTIFY
@@ -154,7 +155,7 @@ graph TB
 
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES,SABLIER internal
-    class IMMICH,NEXTCLOUD,PLAUSIBLE,OTTRBOX,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
+    class IMMICH,NEXTCLOUD,PLAUSIBLE,PINGVIN_SHARE_X,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
     class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
 ```
 
@@ -226,9 +227,9 @@ To facilitate secure public access to a subset of my services, I use [Cloudflare
 
 [Plausible](https://plausible.io/) is a web analytics tool that is privacy-friendly and compliant with GDPR. It provides insights into website traffic without compromising user privacy. I use it to track and analyze the traffic to my internal and external services.
 
-### [OttrBox](./ottrbox/)
+### [Pingvin Share X](./pingvin-share-x/)
 
-[OttrBox](https://github.com/aottr/ottrbox) is a fork of the archived [Pingvin Share](https://github.com/stonith404/pingvin-share) project. It is a self-hosted file sharing service that I expose publicly to send and receive files easily and securely.
+[Pingvin Share X](https://github.com/smp46/pingvin-share-x) is a fork of the archived [Pingvin Share](https://github.com/stonith404/pingvin-share) project. It is a self-hosted file sharing service that I expose publicly to send and receive files easily and securely.
 
 ### [AirTrail](./airtrail/)
 

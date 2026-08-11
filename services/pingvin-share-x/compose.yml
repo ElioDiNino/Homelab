@@ -1,6 +1,6 @@
 services:
-  ottrbox:
-    image: ghcr.io/aottr/ottrbox:v1
+  pingvin-share-x:
+    image: ghcr.io/smp46/pingvin-share-x:v1
     restart: always
     configs:
       - source: config
@@ -11,40 +11,50 @@ services:
       TRUST_PROXY: true
     networks:
       - proxy-internal
-      - proxy-ottrbox
+      - proxy-pingvin-share-x
     labels:
       diun.enable: true
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy share
+      caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
       homepage.group: Media
-      homepage.name: OttrBox
-      homepage.icon: pingvin-share
-      homepage.href: https://${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_EXTERNAL_DOMAIN}}
+      homepage.name: Pingvin Share X
+      homepage.icon: pingvin-share-x
+      homepage.href: https://share.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: Temporary file sharing
       homepage.weight: 100
 
 configs:
   config:
     content: |
-      # Ref: https://github.com/aottr/ottrbox/blob/main/config.example.yaml
+      # Ref: https://github.com/smp46/pingvin-share-x/blob/main/config.example.yaml
       general:
-        appUrl: https://${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
+        appUrl: https://${PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
         secureCookies: "true"
         showHomePage: "false"
         sessionDuration: 1 day
+        defaultLanguage: en-US
       share:
         allowRegistration: "false"
         allowUnauthenticatedShares: "false"
         maxExpiration: 1 month
+        defaultExpiration: 7 days
         shareIdLength: "12"
-        maxSize: "${OTTRBOX_MAX_SHARE_BYTES:-1000000000}" # 1 GB default
+        maxSize: "${PINGVIN_SHARE_X_MAX_SHARE_BYTES:-1000000000}" # 1 GB default
         zipCompressionLevel: "9"
         chunkSize: "10000000" # 10 MB
         autoOpenShareModal: "false"
+        reverseShareSimpleOnly: "false"
         allowAdminAccessAllShares: "true"
+        enableUserRecipients: "false"
+        fileRetentionPeriod: 0 days
       cache:
         redis-enabled: "false"
       email:
         enableShareEmailRecipients: "true"
-        enableShareEmailPastRecipients: "false"
+        enableShareDownloadNotifications: "true"
+        shareRecipientsReplyToCreator: "true"
+        enableEmailVerification: "true"
       smtp:
         enabled: "true"
         allowUnauthorizedCertificates: "false"
@@ -70,8 +80,8 @@ configs:
         oidc-usernameClaim: "preferred_username"
         oidc-roleGeneralAccess: "users"
         oidc-roleAdminAccess: "admins"
-        oidc-clientId: "${OTTRBOX_OIDC_CLIENT_ID:?error}"
-        oidc-clientSecret: "${OTTRBOX_OIDC_CLIENT_SECRET:?error}"
+        oidc-clientId: "${PINGVIN_SHARE_X_OIDC_CLIENT_ID:?error}"
+        oidc-clientSecret: "${PINGVIN_SHARE_X_OIDC_CLIENT_SECRET:?error}"
       s3:
         enabled: "false"
       legal:
@@ -85,5 +95,5 @@ volumes:
 networks:
   proxy-internal:
     external: true
-  proxy-ottrbox:
+  proxy-pingvin-share-x:
     external: true

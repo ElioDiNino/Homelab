@@ -236,14 +236,14 @@ services:
       - proxy-plausible
       - proxy-immich-public
       - proxy-immich-upload-public
-      - proxy-ottrbox
+      - proxy-pingvin-share-x
     environment:
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
       INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN: ${IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN:?error}
-      OTTRBOX_EXTERNAL_SUBDOMAIN: ${OTTRBOX_EXTERNAL_SUBDOMAIN:?error}
+      PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN: ${PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN:?error}
     labels:
       diun.enable: true
 
@@ -318,8 +318,15 @@ configs:
         }
       }
 
-      {$$OTTRBOX_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-        reverse_proxy ottrbox:3000
+      {$$PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
+        @external path /upload/* /s/* /share/* /api/shares /api/shares/* /api/reverseShares/* /_next/static/* /img/* /manifest.json /favicon.ico
+        handle @external {
+          reverse_proxy pingvin-share-x:3000
+        }
+
+        handle {
+          redir https://share.{$$INTERNAL_DOMAIN}{uri} permanent
+        }
       }
 
       :80 {
@@ -351,5 +358,5 @@ networks:
     external: true
   proxy-immich-upload-public:
     external: true
-  proxy-ottrbox:
+  proxy-pingvin-share-x:
     external: true
