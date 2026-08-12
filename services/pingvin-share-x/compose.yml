@@ -19,7 +19,7 @@ services:
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
       homepage.group: Media
       homepage.name: Pingvin Share X
-      homepage.icon: pingvin-share-x
+      homepage.icon: sh-pingvin-share-x
       homepage.href: https://share.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       homepage.description: Temporary file sharing
       homepage.weight: 100
