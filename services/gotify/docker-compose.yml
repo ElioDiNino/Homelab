@@ -27,16 +27,16 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy gotify
       caddy.import.reverse_proxy: "{{ upstreams 80 }}"
-      homepage.group: Monitoring
-      homepage.name: Gotify
-      homepage.icon: gotify
-      homepage.href: https://gotify.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.description: Push notifications
-      homepage.weight: 4
-      homepage.widget.type: gotify
-      homepage.widget.url: https://gotify.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.widget.key: "{{HOMEPAGE_FILE_GOTIFY_API_TOKEN}}"
-      homepage.widget.fields: '["messages"]'
+      homepage.instance.admin.group: Monitoring
+      homepage.instance.admin.name: Gotify
+      homepage.instance.admin.icon: gotify
+      homepage.instance.admin.href: https://gotify.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: Push notifications
+      homepage.instance.admin.weight: 4
+      homepage.instance.admin.widget.type: gotify
+      homepage.instance.admin.widget.url: https://gotify.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.widget.key: "{{HOMEPAGE_FILE_GOTIFY_API_TOKEN}}"
+      homepage.instance.admin.widget.fields: '["messages"]'
 
 secrets:
   oidc_clientsecret:

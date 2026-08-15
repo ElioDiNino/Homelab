@@ -22,7 +22,8 @@ services:
       - beszel-agent
       - caddy
       - diun
-      - homepage
+      - homepage-public
+      - homepage-admin
       - sablier
       - tinyauth
     labels:
@@ -38,8 +39,11 @@ networks:
   diun:
     name: socket-proxy-diun
     internal: true
-  homepage:
-    name: socket-proxy-homepage
+  homepage-public:
+    name: socket-proxy-homepage-public
+    internal: true
+  homepage-admin:
+    name: socket-proxy-homepage-admin
     internal: true
   sablier:
     name: socket-proxy-sablier

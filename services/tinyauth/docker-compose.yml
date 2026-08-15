@@ -35,12 +35,12 @@ services:
       caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
       socket-proxy.allow.get: (/v1\.\d{1,2})?/(_ping|containers/(json|[\w.-]+/json)(\?\S+)?)
       socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
-      homepage.group: Authentication
-      homepage.name: Tinyauth
-      homepage.icon: tinyauth
-      homepage.href: https://auth.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.description: Authentication proxy
-      homepage.weight: 100
+      homepage.instance.admin.group: Authentication
+      homepage.instance.admin.name: Tinyauth
+      homepage.instance.admin.icon: tinyauth
+      homepage.instance.admin.href: https://auth.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: Authentication proxy
+      homepage.instance.admin.weight: 100
 
 secrets:
   client_secret:

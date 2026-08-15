@@ -21,17 +21,17 @@ services:
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy beszel
       caddy.import.reverse_proxy: "{{ upstreams 8090 }}"
-      homepage.group: Monitoring
-      homepage.name: Beszel
-      homepage.icon: beszel
-      homepage.href: https://beszel.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.description: System resource monitor
-      homepage.weight: 1
-      homepage.widget.type: beszel
-      homepage.widget.version: 2
-      homepage.widget.url: https://beszel.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.widget.username: "{{HOMEPAGE_FILE_BESZEL_USERNAME}}"
-      homepage.widget.password: "{{HOMEPAGE_FILE_BESZEL_PASSWORD}}"
+      homepage.instance.admin.group: Monitoring
+      homepage.instance.admin.name: Beszel
+      homepage.instance.admin.icon: beszel
+      homepage.instance.admin.href: https://beszel.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: System resource monitor
+      homepage.instance.admin.weight: 1
+      homepage.instance.admin.widget.type: beszel
+      homepage.instance.admin.widget.version: 2
+      homepage.instance.admin.widget.url: https://beszel.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.widget.username: "{{HOMEPAGE_FILE_BESZEL_USERNAME}}"
+      homepage.instance.admin.widget.password: "{{HOMEPAGE_FILE_BESZEL_PASSWORD}}"
 
   beszel-local-agent:
     image: ghcr.io/henrygd/beszel/beszel-agent:0

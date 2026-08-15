@@ -36,7 +36,7 @@ services:
       CERTIFICATES_EMAIL: ${CERTIFICATES_EMAIL:?error}
       INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       WILDCARD_INTERNAL: "*.${INTERNAL_DOMAIN:?error}"
-      DASHBOARD_SUBDOMAIN: ${DASHBOARD_SUBDOMAIN:?error}
+      DASHBOARD_PUBLIC_SUBDOMAIN: ${DASHBOARD_PUBLIC_SUBDOMAIN:?error}
       PROXMOX_HOST: ${PROXMOX_HOST:?error}
       HEXOS_HOST: ${HEXOS_HOST:?error}
       HAOS_HOST: ${HAOS_HOST:?error}
@@ -47,12 +47,12 @@ services:
       diun.include_tags: ^latest$
       socket-proxy.allow.get: (/v1\.\d{1,2})?/(info|containers/json(\?\S+)?|events(\?\S+)?|networks(/\w+)?)
       socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
-      homepage.group: Debugging
-      homepage.name: Ping
-      homepage.icon: mdi-connection
-      homepage.href: https://ping.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.description: Network connection test
-      homepage.weight: 2
+      homepage.instance.admin.group: Debugging
+      homepage.instance.admin.name: Ping
+      homepage.instance.admin.icon: mdi-connection
+      homepage.instance.admin.href: https://ping.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: Network connection test
+      homepage.instance.admin.weight: 2
 
   error-pages:
     image: ghcr.io/tarampampam/error-pages:4
@@ -64,7 +64,7 @@ services:
     environment:
       TEMPLATE_NAME: connection
       SEND_SAME_HTTP_CODE: true
-      HOMEPAGE_URL: https://${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_URL: https://${DASHBOARD_PUBLIC_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
       ADD_LINK: Status Page=https://status.${INTERNAL_DOMAIN:?error}/status/
     labels:
       diun.enable: true
@@ -190,17 +190,17 @@ services:
       caddy_20.2_import.reverse_proxy: "{{ upstreams 80 }}"
       tinyauth.apps.whoami.config.domain: whoami.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.whoami.oauth.groups: admins
-      homepage.group: Debugging
-      homepage.name: Who Am I
-      homepage.icon: mdi-account-question
-      homepage.href: https://whoami.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
-      homepage.description: Request inspection
-      homepage.weight: 1
+      homepage.instance.admin.group: Debugging
+      homepage.instance.admin.name: Who Am I
+      homepage.instance.admin.icon: mdi-account-question
+      homepage.instance.admin.href: https://whoami.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: Request inspection
+      homepage.instance.admin.weight: 1
 
       # Internal access check
       caddy_20.3_import: service_proxy ping
       caddy_20.3_import.header.Access-Control-Allow-Origin: "*"
-      caddy_20.3_import.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
+      caddy_20.3_import.respond: "`{\"result\": \"Success!\",\"dashboard\": \"https://{$$DASHBOARD_PUBLIC_SUBDOMAIN}.{$$INTERNAL_DOMAIN}\"}` 200"
 
       # Proxmox
       caddy_20.4_import: service_proxy pve

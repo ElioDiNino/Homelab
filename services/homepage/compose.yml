@@ -1,22 +1,65 @@
+x-service-defaults: &service-defaults
+  image: ghcr.io/gethomepage/homepage:v2
+  restart: always
+  secrets:
+    - airtrail-api-key
+    - immich-api-key
+    - nextcloud-serverinfo-token
+x-environment-defaults: &environment-defaults
+  HOMEPAGE_VAR_EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
+  HOMEPAGE_VAR_INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+  HOMEPAGE_FILE_AIRTRAIL_API_KEY: /run/secrets/airtrail-api-key
+  HOMEPAGE_FILE_IMMICH_API_KEY: /run/secrets/immich-api-key
+  HOMEPAGE_FILE_NEXTCLOUD_SERVERINFO_TOKEN: /run/secrets/nextcloud-serverinfo-token
+x-labels-defaults: &labels-defaults
+  diun.enable: true
+  socket-proxy.allow.get: (/v1\.\d{1,2})?/containers/(json|[\w.-]+/(json|stats))(\?\S+)?
+  caddy: "{$$WILDCARD_INTERNAL}"
+  caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+
 services:
-  homepage:
-    image: ghcr.io/gethomepage/homepage:v1
-    restart: always
+  homepage-public:
+    <<: *service-defaults
     configs:
-      - source: docker
+      - &config-docker
+        source: docker
         target: /app/config/docker.yaml
+      - source: settings-public
+        target: /app/config/settings.yaml
+      - source: bookmarks-public
+        target: /app/config/bookmarks.yaml
+      - &config-widgets
+        source: widgets
+        target: /app/config/widgets.yaml
+      - source: services-public
+        target: /app/config/services.yaml
+      - &config-custom-css
+        source: custom-css
+        target: /app/config/custom.css
+    environment:
+      <<: *environment-defaults
+      HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_PUBLIC_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+    networks:
+      - proxy-internal
+      - socket-proxy-homepage-public
+    labels:
+      <<: *labels-defaults
+      caddy.import: service_proxy ${DASHBOARD_PUBLIC_SUBDOMAIN:?error}
+
+  homepage-admin:
+    <<: *service-defaults
+    configs:
+      - *config-docker
+      - *config-widgets
+      - *config-custom-css
       - source: proxmox
         target: /app/config/proxmox.yaml
-      - source: settings
+      - source: settings-admin
         target: /app/config/settings.yaml
-      - source: bookmarks
+      - source: bookmarks-admin
         target: /app/config/bookmarks.yaml
-      - source: widgets
-        target: /app/config/widgets.yaml
-      - source: services
+      - source: services-admin
         target: /app/config/services.yaml
-      - source: custom-css
-        target: /app/config/custom.css
     secrets:
       - airtrail-api-key
       - beszel-username
@@ -30,32 +73,33 @@ services:
       - proxmox-api-secret
       - truenas-api-key
     environment:
-      HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
-      HOMEPAGE_VAR_EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
-      HOMEPAGE_VAR_INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
+      <<: *environment-defaults
+      HOMEPAGE_ALLOWED_HOSTS: ${DASHBOARD_ADMIN_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_AUTH_ENABLED: true
+      HOMEPAGE_AUTH_SECRET: ${HOMEPAGE_AUTH_SECRET:?error}
+      HOMEPAGE_EXTERNAL_URL: https://${DASHBOARD_ADMIN_SUBDOMAIN:?error}.${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_OIDC_ISSUER: https://id.${INTERNAL_DOMAIN:?error}
+      HOMEPAGE_OIDC_CLIENT_ID: ${HOMEPAGE_OIDC_CLIENT_ID:?error}
+      HOMEPAGE_OIDC_CLIENT_SECRET: ${HOMEPAGE_OIDC_CLIENT_SECRET:?error}
+      HOMEPAGE_OIDC_NAME: Pocket ID
+      HOMEPAGE_OIDC_SCOPES: openid profile email
       HOMEPAGE_VAR_PORTAINER_ENVIRONMENT_ID: ${HOMEPAGE_PORTAINER_ENVIRONMENT_ID:?error}
       HOMEPAGE_VAR_PROXMOX_HAOS_VMID: ${HOMEPAGE_PROXMOX_HAOS_VMID:?error}
       HOMEPAGE_VAR_PROXMOX_HEXOS_VMID: ${HOMEPAGE_PROXMOX_HEXOS_VMID:?error}
-      HOMEPAGE_FILE_AIRTRAIL_API_KEY: /run/secrets/airtrail-api-key
       HOMEPAGE_FILE_BESZEL_USERNAME: /run/secrets/beszel-username
       HOMEPAGE_FILE_BESZEL_PASSWORD: /run/secrets/beszel-password
       HOMEPAGE_FILE_GOTIFY_API_TOKEN: /run/secrets/gotify-api-token
       HOMEPAGE_FILE_HEALTHCHECKS_API_KEY: /run/secrets/healthchecks-api-key
-      HOMEPAGE_FILE_IMMICH_API_KEY: /run/secrets/immich-api-key
-      HOMEPAGE_FILE_NEXTCLOUD_SERVERINFO_TOKEN: /run/secrets/nextcloud-serverinfo-token
       HOMEPAGE_FILE_PORTAINER_API_KEY: /run/secrets/portainer-api-key
       HOMEPAGE_FILE_PROXMOX_API_TOKEN: /run/secrets/proxmox-api-token
       HOMEPAGE_FILE_PROXMOX_API_SECRET: /run/secrets/proxmox-api-secret
       HOMEPAGE_FILE_TRUENAS_API_KEY: /run/secrets/truenas-api-key
     networks:
       - proxy-internal
-      - socket-proxy-homepage
+      - socket-proxy-homepage-admin
     labels:
-      diun.enable: true
-      socket-proxy.allow.get: (/v1\.\d{1,2})?/containers/(json|[\w.-]+/(json|stats))(\?\S+)?
-      caddy: "{$$WILDCARD_INTERNAL}"
-      caddy.import: service_proxy ${DASHBOARD_SUBDOMAIN:?error}
-      caddy.import.reverse_proxy: "{{ upstreams 3000 }}"
+      <<: *labels-defaults
+      caddy.import: service_proxy ${DASHBOARD_ADMIN_SUBDOMAIN:?error}
 
 configs:
   docker:
@@ -71,14 +115,14 @@ configs:
         token: {{HOMEPAGE_FILE_PROXMOX_API_TOKEN}}
         secret: {{HOMEPAGE_FILE_PROXMOX_API_SECRET}}
 
-  settings:
+  settings-public:
     content: |
       title: Homelab Dashboard
       description: The dashboard for Elio's Homelab services.
       theme: dark
       color: neutral
       headerStyle: clean
-      base: https://${DASHBOARD_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      base: https://${DASHBOARD_PUBLIC_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
       language: en-CA
       target: _blank
       quicklaunch:
@@ -88,6 +132,52 @@ configs:
       hideVersion: true
       disableUpdateCheck: true
       statusStyle: dot
+      instanceName: public
+      hideErrors: true
+      disableIndexing: true
+
+      iconStyle: theme
+      useEqualHeights: true
+
+      layout:
+        Main Tab:
+          header: false
+          M Group 1:
+            header: false
+            style: row
+            columns: 2
+            Home:
+              style: column
+              icon: mdi-home
+            Media:
+              style: column
+              icon: mdi-folder-multiple-image
+            Analytics:
+              style: column
+              icon: mdi-chart-line
+            Tools:
+              tab: Main
+              style: column
+              icon: mdi-tools
+
+  settings-admin:
+    content: |
+      title: Homelab Admin Dashboard
+      description: The admin dashboard for Elio's Homelab services.
+      theme: dark
+      color: neutral
+      headerStyle: clean
+      base: https://${DASHBOARD_ADMIN_SUBDOMAIN:?error}.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      language: en-CA
+      target: _blank
+      quicklaunch:
+        searchDescriptions: true
+        hideInternetSearch: true
+        mobileButtonPosition: bottom-right
+      hideVersion: true
+      disableUpdateCheck: false
+      statusStyle: dot
+      instanceName: admin
       disableIndexing: true
 
       iconStyle: theme
@@ -150,7 +240,11 @@ configs:
           tab: Administration
           icon: mdi-book-open-variant
 
-  bookmarks:
+  bookmarks-public:
+    content: |
+      # Empty
+
+  bookmarks-admin:
     content: |
       - Development:
           - Task List:
@@ -172,7 +266,18 @@ configs:
           text_size: 2xl
           text: Homelab Dashboard
 
-  services:
+  services-public:
+    content: |
+      - Main Tab:
+          - M Group 1:
+              - Home:
+                  - Home Assistant:
+                      icon: home-assistant
+                      href: https://ha.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+                      description: Home automation
+                      weight: 100
+
+  services-admin:
     content: |
       - Main Tab:
           - M Group 1:
@@ -375,9 +480,11 @@ configs:
       }
 
       #theme,
-      #revalidate {
+      #revalidate,
+      #signout {
         align-items: center;
-        > svg {
+        > svg,
+        > button > svg {
           height: 2rem;
           width: auto;
         }
@@ -436,5 +543,7 @@ secrets:
 networks:
   proxy-internal:
     external: true
-  socket-proxy-homepage:
+  socket-proxy-homepage-public:
+    external: true
+  socket-proxy-homepage-admin:
     external: true
