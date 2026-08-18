@@ -11,9 +11,11 @@ services:
       interval: 120s
     environment:
       APP_URL: "https://beszel.${INTERNAL_DOMAIN:?error}"
+      CHECK_UPDATES: true
+      DISABLE_PASSWORD_AUTH: true
+      OAUTH_DISABLE_POPUP: true
       SHARE_ALL_SYSTEMS: true
       USER_CREATION: true
-      DISABLE_PASSWORD_AUTH: true
     networks:
       - proxy-internal
     labels:
