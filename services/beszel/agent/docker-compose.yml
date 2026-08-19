@@ -4,6 +4,7 @@ services:
     restart: always
     volumes:
       - data:/var/lib/beszel-agent
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     healthcheck:
       test: ["CMD", "/agent", "health"]
       start_period: 5s
