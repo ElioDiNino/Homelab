@@ -22,7 +22,10 @@ services:
       diun.enable: true
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy beszel
+      caddy.import.request_body.max_size: 10MB
       caddy.import.reverse_proxy: "{{ upstreams 8090 }}"
+      caddy.import.reverse_proxy.transport: http
+      caddy.import.reverse_proxy.transport.read_timeout: 360s
       homepage.instance.admin.group: Monitoring
       homepage.instance.admin.name: Beszel
       homepage.instance.admin.icon: beszel
