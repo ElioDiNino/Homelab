@@ -47,6 +47,7 @@ services:
     volumes:
       - data-agent:/var/lib/beszel-agent
       - beszel-socket:/beszel_socket
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
     healthcheck:
       test: ["CMD", "/agent", "health"]
       start_period: 5s
