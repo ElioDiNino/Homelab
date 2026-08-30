@@ -6,7 +6,7 @@ services:
       - redis
       - database
     # extends:
-    #   file: hwaccel.transcoding.yml
+    #   file: hwaccel.transcoding.yaml
     #   service: quicksync
     volumes:
       - uploads:/data

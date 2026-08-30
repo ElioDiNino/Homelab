@@ -2,7 +2,7 @@
 
 # If using Unraid or another platform that doesn't allow multiple Compose files,
 # you can inline the config for a backend by copying its contents
-# into the immich-microservices service in the docker-compose.yml file.
+# into the immich-microservices service in the compose.yaml file.
 
 # See https://docs.immich.app/features/hardware-transcoding for more info on using hardware transcoding.
 
