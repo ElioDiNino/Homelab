@@ -11,6 +11,7 @@ services:
       GOTIFY_LOG_LEVEL: ${GOTIFY_LOG_LEVEL:-info}
       GOTIFY_SERVER_TRUSTEDPROXIES: 172.16.0.0/12
       GOTIFY_SECURECOOKIE: true
+      GOTIFY_LOCALAUTH_ENABLED: false
       GOTIFY_OIDC_ENABLED: true
       GOTIFY_OIDC_ISSUER: https://id.${INTERNAL_DOMAIN:?error}
       GOTIFY_OIDC_CLIENTID: ${GOTIFY_OIDC_CLIENTID:?error}
@@ -19,7 +20,13 @@ services:
       GOTIFY_OIDC_AUTOREGISTER: false
       GOTIFY_OIDC_LINK_BY_USERNAME: true
       GOTIFY_OIDC_USERNAMECLAIM: gotify_user # Map all allowed users to the same Gotify user
+      GOTIFY_OIDC_GROUPS_CLAIM: groups
+      GOTIFY_OIDC_GROUPS_USER: users
+      GOTIFY_OIDC_GROUPS_ADMIN: admins
       GOTIFY_OIDC_SCOPES: openid,profile,email,groups
+      GOTIFY_OIDC_AUTO_REDIRECT: true
+      GOTIFY_OIDC_IDP_NAME: Pocket ID
+      GOTIFY_REGISTRATION: false
     networks:
       - proxy-internal
     labels:
