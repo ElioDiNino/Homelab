@@ -72,7 +72,6 @@ services:
             "maxZoomQuality": "fullsize",
             "downloadedFilename": 2,
             "allowDownload": 1,
-            "downloadFromImmichConcurrencyLimit": 10,
             "allowSlugLinks": false,
             "showHomePage": true,
             "showMetadata": {
