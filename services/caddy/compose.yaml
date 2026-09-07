@@ -238,8 +238,8 @@ services:
       - proxy-immich-upload-public
       - proxy-pingvin-share-x
     environment:
-      INTERNAL_DOMAIN: ${INTERNAL_DOMAIN:?error}
       EXTERNAL_DOMAIN: ${EXTERNAL_DOMAIN:?error}
+      HOMELAB_EXTERNAL_SUBDOMAIN: ${HOMELAB_EXTERNAL_SUBDOMAIN:?error}
       INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN: ${IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN:?error}
@@ -276,7 +276,7 @@ configs:
         }
 
         handle {
-          redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
+          redir https://{$$HOMELAB_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}?next=photos{uri} temporary
         }
       }
 
@@ -314,7 +314,7 @@ configs:
         }
 
         handle {
-          redir https://photos.{$$INTERNAL_DOMAIN}{uri} permanent
+          redir https://{$$HOMELAB_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}?next=photos{uri} temporary
         }
       }
 
@@ -325,7 +325,7 @@ configs:
         }
 
         handle {
-          redir https://share.{$$INTERNAL_DOMAIN}{uri} permanent
+          redir https://{$$HOMELAB_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}?next=share{uri} temporary
         }
       }
 
