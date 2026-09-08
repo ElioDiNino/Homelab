@@ -61,6 +61,8 @@ services:
       - source: services-admin
         target: /app/config/services.yaml
     secrets:
+      - adguard-username
+      - adguard-password
       - airtrail-api-key
       - beszel-username
       - beszel-password
@@ -87,6 +89,8 @@ services:
       HOMEPAGE_VAR_PORTAINER_ENVIRONMENT_ID: ${HOMEPAGE_PORTAINER_ENVIRONMENT_ID:?error}
       HOMEPAGE_VAR_PROXMOX_HAOS_VMID: ${HOMEPAGE_PROXMOX_HAOS_VMID:?error}
       HOMEPAGE_VAR_PROXMOX_HEXOS_VMID: ${HOMEPAGE_PROXMOX_HEXOS_VMID:?error}
+      HOMEPAGE_FILE_ADGUARD_USERNAME: /run/secrets/adguard-username
+      HOMEPAGE_FILE_ADGUARD_PASSWORD: /run/secrets/adguard-password
       HOMEPAGE_FILE_BESZEL_USERNAME: /run/secrets/beszel-username
       HOMEPAGE_FILE_BESZEL_PASSWORD: /run/secrets/beszel-password
       HOMEPAGE_FILE_GOTIFY_API_TOKEN: /run/secrets/gotify-api-token
@@ -518,6 +522,10 @@ configs:
       }
 
 secrets:
+  adguard-username:
+    environment: HOMEPAGE_ADGUARD_USERNAME
+  adguard-password:
+    environment: HOMEPAGE_ADGUARD_PASSWORD
   airtrail-api-key:
     environment: HOMEPAGE_AIRTRAIL_API_KEY
   beszel-username:

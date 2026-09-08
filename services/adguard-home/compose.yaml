@@ -1,0 +1,57 @@
+services:
+  adguard-home:
+    image: adguard/adguardhome:latest
+    restart: always
+    volumes:
+      - work:/opt/adguardhome/work
+      - conf:/opt/adguardhome/conf
+    ports:
+      # Plain DNS; encrypted DNS (DoH) is served through Caddy
+      - 53:53/tcp
+      - 53:53/udp
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O /dev/null http://127.0.0.1:3000/ || exit 1"]
+      start_period: 30s
+      start_interval: 5s
+      interval: 1m30s
+    environment:
+      TZ: ${TIMEZONE:?error}
+    networks:
+      - proxy-internal
+    labels:
+      diun.enable: true
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
+      caddy: "{$$WILDCARD_INTERNAL}"
+      caddy.import: service_proxy dns
+      # Bypasses Tinyauth for DoH so that resolution does not depend on it being available
+      caddy.import.@doh: path /dns-query /dns-query/*
+      caddy.import.0_handle: "@doh"
+      caddy.import.0_handle.reverse_proxy: "{{ upstreams 3000 }}"
+      caddy.import.1_handle: ""
+      caddy.import.1_handle.import: tinyauth
+      caddy.import.1_handle.reverse_proxy: "{{ upstreams 3000 }}"
+      tinyauth.apps.adguard-home.config.domain: dns.${INTERNAL_DOMAIN:?error}
+      tinyauth.apps.adguard-home.oauth.groups: admins
+      tinyauth.apps.adguard-home.response.basicauth.username: ${ADGUARD_USERNAME:?error}
+      tinyauth.apps.adguard-home.response.basicauth.passwordFile: /run/secrets/adguard_password
+      homepage.instance.admin.group: Infrastructure
+      homepage.instance.admin.name: AdGuard Home
+      homepage.instance.admin.icon: adguard-home
+      homepage.instance.admin.href: https://dns.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}
+      homepage.instance.admin.description: DNS filtering
+      homepage.instance.admin.weight: 400
+      homepage.instance.admin.widget.type: adguard
+      # Queried directly so the stats endpoint doesn't have to be opened up through Tinyauth
+      homepage.instance.admin.widget.url: http://adguard-home:3000
+      homepage.instance.admin.widget.username: "{{HOMEPAGE_FILE_ADGUARD_USERNAME}}"
+      homepage.instance.admin.widget.password: "{{HOMEPAGE_FILE_ADGUARD_PASSWORD}}"
+      homepage.instance.admin.widget.fields: '["queries", "blocked", "latency"]'
+
+volumes:
+  work:
+  conf:
+
+networks:
+  proxy-internal:
+    external: true
