@@ -140,7 +140,7 @@ services:
       caddy_3: (tinyauth)
       caddy_3.forward_auth: tinyauth:3000
       caddy_3.forward_auth.uri: /api/auth/caddy
-      caddy_3.forward_auth.copy_headers: Remote-User Remote-Name Remote-Email Remote-Groups
+      caddy_3.forward_auth.copy_headers: Remote-User Remote-Name Remote-Email Remote-Groups Authorization
 
       # Pretty error pages
       caddy_4: (error_pages)
@@ -190,6 +190,8 @@ services:
       caddy_20.2_import.reverse_proxy: "{{ upstreams 80 }}"
       tinyauth.apps.whoami.config.domain: whoami.${INTERNAL_DOMAIN:?error}
       tinyauth.apps.whoami.oauth.groups: admins
+      tinyauth.apps.whoami.response.basicauth.username: test
+      tinyauth.apps.whoami.response.basicauth.password: test
       homepage.instance.admin.group: Debugging
       homepage.instance.admin.name: Who Am I
       homepage.instance.admin.icon: mdi-account-question

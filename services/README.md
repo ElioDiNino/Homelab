@@ -89,6 +89,7 @@ graph TB
         end
 
         subgraph "Infrastructure Services"
+            ADGUARD[AdGuard Home]
             BESZEL_AGENT[Beszel Agent]
             DIUN[Diun]
             SOCKET_PROXY[Docker Socket Proxy]
@@ -114,6 +115,7 @@ graph TB
     %% Internal Access
     INT --> TAILSCALE
     TAILSCALE --> CADDY_INT
+    TAILSCALE --> ADGUARD
 
     %% Internal Service Routing
     CADDY_INT --> ERROR_PAGES
@@ -136,6 +138,7 @@ graph TB
     CADDY_INT --> PORTAINER
     CADDY_INT --> BESZEL_HUB
     CADDY_INT --> TINYAUTH
+    CADDY_INT --> ADGUARD
 
     %% Service Dependencies
     BESZEL_HUB --> BESZEL_AGENT
@@ -156,7 +159,7 @@ graph TB
     class CF,CF_TUNNEL,IMMICH_PROXY,CADDY_EXT external
     class TAILSCALE,CADDY_INT,ERROR_PAGES,SABLIER internal
     class IMMICH,NEXTCLOUD,PLAUSIBLE,PINGVIN_SHARE_X,HOMEPAGE,PORTAINER,BESZEL_HUB,POCKET_ID,GOTIFY,HEALTHCHECKS,UPTIME_KUMA,AIRTRAIL,STIRLING,MAZANOKE,CONVERTX,IT_TOOLS,SPOTIFY,TINYAUTH user-services
-    class SOCKET_PROXY,BESZEL_AGENT,DIUN infra-services
+    class SOCKET_PROXY,BESZEL_AGENT,DIUN,ADGUARD infra-services
 ```
 
 ## Services
@@ -208,6 +211,10 @@ To monitor the uptime of my services, I use [Uptime Kuma](https://github.com/lou
 ### [Docker Socket Proxy](./socket-proxy/)
 
 Due to some services' reliance on connection to the docker socket, I use [Docker Socket Proxy](https://github.com/wollomatic/socket-proxy) to securely expose the Docker API to my services in read-only mode without giving them direct access to the Docker daemon (with the exception of Portainer, which requires full access).
+
+### [AdGuard Home](./adguard-home/)
+
+[AdGuard Home](https://adguard.com/en/adguard-home/overview.html) is a DNS server that blocks ads and trackers for every device on my network. I have also configured DNS rewrites so devices on my home router's network that are not connected to Tailscale can access services that are otherwise only available through Tailscale.
 
 ### [Immich](./immich/)
 

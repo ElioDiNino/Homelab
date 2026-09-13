@@ -6,6 +6,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     secrets:
       - client_secret
+      - adguard_password
     environment:
       DOCKER_HOST: tcp://socket-proxy:2375
       TINYAUTH_UI_TITLE: Authentication Proxy
@@ -45,6 +46,8 @@ services:
 secrets:
   client_secret:
     environment: TINYAUTH_CLIENT_SECRET
+  adguard_password:
+    environment: ADGUARD_PASSWORD
 
 networks:
   proxy-internal:
