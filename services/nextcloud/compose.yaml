@@ -60,8 +60,7 @@ services:
       - apache:/mnt/data:rw
       - nextcloud:/var/www/html:ro
     tmpfs:
-      - /var/log/supervisord
-      - /var/run/supervisord
+      - /run
       - /usr/local/apache2/logs
       - /tmp
       - /home/www-data
@@ -255,12 +254,13 @@ services:
       - CHOWN
     healthcheck:
       <<: *healthcheck_defaults
+      test: /usr/bin/coolwsd --probe --use-env-vars
       start_period: 60s
       retries: 9
     environment:
       <<: *environment_defaults
       aliasgroup1: https://cloud.${INTERNAL_DOMAIN:?error}:443,http://apache.nextcloud-aio:23973
-      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:logging.disable_server_audit=true --o:welcome.enable=false --o:fetch_update_check=0 --o:allow_update_popup=false --o:remote_font_config.url=https://cloud.${INTERNAL_DOMAIN:?error}/apps/richdocuments/settings/fonts.json --o:net.post_allow.host[0]=.+
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:logging.disable_server_audit=true --o:welcome.enable=false --o:fetch_update_check=0 --o:allow_update_popup=false --o:logging.level=${NEXTCLOUD_COLLABORA_LOG_LEVEL:-warning} --o:logging.level_startup=${NEXTCLOUD_COLLABORA_LOG_LEVEL:-warning} --o:remote_font_config.url=https://cloud.${INTERNAL_DOMAIN:?error}/apps/richdocuments/settings/fonts.json --o:net.post_allow.host[0]=.+
       dictionaries: "de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT"
       server_name: *nextcloud_domain
       DONT_GEN_SSL_CERT: 1
