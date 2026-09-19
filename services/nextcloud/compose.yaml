@@ -51,7 +51,7 @@ services:
       nextcloud:
         <<: *depends_on-started
       collabora:
-        <<: *depends_on-healthy
+        <<: *depends_on-started
       notify-push:
         <<: *depends_on-started
       whiteboard:
@@ -254,7 +254,7 @@ services:
       - CHOWN
     healthcheck:
       <<: *healthcheck_defaults
-      test: /usr/bin/coolwsd --probe --use-env-vars
+      test: ["CMD", "/usr/bin/coolwsd", "--probe", "--use-env-vars"]
       start_period: 60s
       retries: 9
     environment:
