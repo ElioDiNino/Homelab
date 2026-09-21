@@ -70,6 +70,7 @@ services:
             },
             "maxDownloadQuality": "original",
             "maxZoomQuality": "fullsize",
+            "motionPhotos": true,
             "downloadedFilename": 2,
             "allowDownload": 1,
             "allowSlugLinks": false,
