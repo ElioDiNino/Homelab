@@ -17,26 +17,19 @@ services:
       POSTGRES_USER: ${AIRTRAIL_DB_USERNAME:?error}
       POSTGRES_PASSWORD: ${AIRTRAIL_DB_PASSWORD:?error}
 
-  airtrail-volume-perms:
-    image: alpine:latest
-    command: sh -c "chown -R 1000:1000 /tmp/airtrail-uploads"
-    volumes:
-      - uploads:/tmp/airtrail-uploads
-
   airtrail:
     image: johly/airtrail:v3
     restart: always
     depends_on:
       db:
         condition: service_healthy
-      airtrail-volume-perms:
-        condition: service_completed_successfully
     volumes:
       - uploads:/app/uploads
     environment:
       ORIGIN: https://airtrail.${INTERNAL_DOMAIN:?error}
       DB_URL: postgres://${AIRTRAIL_DB_USERNAME:?error}:${AIRTRAIL_DB_PASSWORD:?error}@db:5432/${AIRTRAIL_DB_DATABASE_NAME:?error}
       UPLOAD_LOCATION: /app/uploads
+      ADDRESS_HEADER: X-Forwarded-For
       OAUTH_ENABLED: true
       OAUTH_ISSUER_URL: https://id.${INTERNAL_DOMAIN:?error}/.well-known/openid-configuration
       OAUTH_CLIENT_ID: ${AIRTRAIL_OAUTH_CLIENT_ID:?error}
@@ -46,8 +39,13 @@ services:
       OAUTH_AUTO_LOGIN: true
       OAUTH_HIDE_PASSWORD_FORM: true
       OAUTH_BUTTON_TEXT: "Log in with Pocket ID"
+      INTEGRATIONS_AERO_DATA_BOX_ENDPOINT: rapidapi
       INTEGRATIONS_AERO_DATA_BOX_KEY: ${AIRTRAIL_AERO_DATA_BOX_KEY:?error}
       INTEGRATIONS_OPEN_AIP_KEY: ${AIRTRAIL_OPEN_AIP_KEY:?error}
+      MAP_PROVIDER: carto
+      MAP_CARTO_API_KEY: ${AIRTRAIL_CARTO_API_KEY:?error}
+      PUID: ${AIRTRAIL_UID:?error}
+      PGID: ${AIRTRAIL_GID:?error}
     networks:
       - proxy-internal
       - database
@@ -63,12 +61,22 @@ services:
       homepage.description: Personal flight tracking and analytics
       homepage.weight: 150
       homepage.widget.type: customapi
-      homepage.widget.url: https://airtrail.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}/api/flight/list?scope=all
+      homepage.widget.url: https://airtrail.{{HOMEPAGE_VAR_INTERNAL_DOMAIN}}/api/v1/stats?scope=all
       homepage.widget.headers.Authorization: Bearer {{HOMEPAGE_FILE_AIRTRAIL_API_KEY}}
       homepage.widget.refreshInterval: 300000 # 5 minutes
-      homepage.widget.mappings[0].label: Total Flights
-      homepage.widget.mappings[0].field: flights
-      homepage.widget.mappings[0].format: size
+      homepage.widget.mappings[0].label: Flights
+      homepage.widget.mappings[0].field: data.flights
+      homepage.widget.mappings[0].format: number
+      homepage.widget.mappings[1].label: Airports
+      homepage.widget.mappings[1].field: data.airports
+      homepage.widget.mappings[1].format: number
+      homepage.widget.mappings[2].label: Distance
+      homepage.widget.mappings[2].field: data.distanceKm
+      homepage.widget.mappings[2].format: number
+      homepage.widget.mappings[2].suffix: km
+      homepage.widget.mappings[3].label: Duration
+      homepage.widget.mappings[3].field: data.durationSeconds
+      homepage.widget.mappings[3].format: duration
       homepage.widget.hideErrors: true
 
 volumes:
