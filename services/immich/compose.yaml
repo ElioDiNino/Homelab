@@ -49,7 +49,7 @@ services:
       homepage.widget.hideErrors: true
 
   immich-public-proxy:
-    image: ghcr.io/alangrainger/immich-public-proxy:3
+    image: ghcr.io/alangrainger/immich-public-proxy:4
     restart: always
     depends_on:
       immich-server:
