@@ -354,14 +354,14 @@ volumes:
     driver_opts:
       type: cifs
       device: //${HEXOS_HOST:?error}/${NEXTCLOUD_HEXOS_BACKUP_FOLDER:-Backups/nextcloud}
-      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=999,gid=999,vers=3.0
+      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=999,gid=999,vers=3
   nextcloud:
   nextcloud_data:
     driver: local
     driver_opts:
       type: cifs
       device: //${HEXOS_HOST:?error}/${NEXTCLOUD_HEXOS_FOLDER:-Nextcloud}
-      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=33,gid=0,vers=3.0
+      o: username=${NEXTCLOUD_HEXOS_USERNAME:?error},password=${NEXTCLOUD_HEXOS_PASSWORD:?error},uid=33,gid=0,vers=3
   redis:
   elasticsearch:
 

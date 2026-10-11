@@ -191,7 +191,7 @@ volumes:
     driver_opts:
       type: cifs
       device: //${HEXOS_HOST:?error}/${IMMICH_HEXOS_FOLDER:-Immich}
-      o: username=${IMMICH_HEXOS_USERNAME:?error},password=${IMMICH_HEXOS_PASSWORD:?error},vers=3.0
+      o: username=${IMMICH_HEXOS_USERNAME:?error},password=${IMMICH_HEXOS_PASSWORD:?error},vers=3
 
 networks:
   frontend:
