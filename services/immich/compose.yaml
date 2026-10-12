@@ -1,7 +1,109 @@
+x-restart-policy: &restart_policy
+  restart: always
+x-read_only: &read_only
+  read_only: true
+x-cap_drop: &cap_drop
+  cap_drop:
+    - ALL
+x-security_opt: &security_opt
+  security_opt:
+    - no-new-privileges
+x-healthcheck-defaults: &healthcheck_defaults
+  start_period: 10s
+  timeout: 5s
+x-environment-ipp: &environment-ipp
+  environment:
+    PUBLIC_BASE_URL: https://${IMMICH_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
+    IMMICH_URL: http://immich-server:2283
+    CONFIG: |
+      {
+        "ipp": {
+          "allowDownload": 1,
+          "maxDownloadQuality": "original",
+          "downloadedFilename": 2,
+          "maxZoomQuality": "fullsize",
+          "motionPhotos": true,
+          "showHomePage": true,
+          "allowSlugLinks": false,
+          "uploadUrl": "/upload",
+          "showMetadata": {
+            "description": {
+              "caption": true,
+              "sidebar": true
+            },
+            "exif": {
+              "dateTimeOriginal": true,
+              "timeZone": true,
+              "fileName": false,
+              "dimensions": true,
+              "fileSize": true,
+              "make": true,
+              "model": true,
+              "lensModel": true,
+              "exposureTime": true,
+              "iso": true,
+              "fNumber": true,
+              "focalLength": true
+            },
+            "location": {
+              "city": true,
+              "state": true,
+              "country": true,
+              "gps": true,
+              "webLink": true
+            }
+          },
+          "gallery": {
+            "showTitle": true,
+            "showDescription": true,
+            "showExpiryDate": true,
+            "expiryDateFormat": "MMM D, YYYY [at] h:mm A",
+            "expiryDateLocale": "en-ca",
+            "showDownloadZip": true,
+            "groupByDate": "day",
+            "singleImage": true,
+            "singleVideo": true,
+            "singleItemAutoOpen": true,
+            "cacheTime": 300
+          },
+          "lightbox": {
+            "showArrows": true,
+            "mobileArrows": false,
+            "showDownload": true,
+            "autoPlayVideos": false,
+            "options": {}
+          },
+          "upload": {
+            "maxFileSize": 100,
+            "rateLimit": 60,
+            "byteBudget": 10240,
+            "filenamePrefix": "ipp_upload_",
+            "notifyUrl": "https://gotify.${INTERNAL_DOMAIN:?error}/message?token=${IMMICH_PUBLIC_PROXY_GOTIFY_TOKEN:?error}",
+            "notifyHeaders": {},
+            "notifyTimeout": 10000
+          },
+          "customInvalidResponse": false,
+          "responseHeaders": {
+            "Cache-Control": "public, max-age=2592000",
+            "Access-Control-Allow-Origin":  "*"
+          }
+        }
+      }
+x-ipp-base: &ipp-base
+  <<: [*restart_policy, *read_only, *cap_drop, *security_opt, *environment-ipp]
+  depends_on:
+    immich-server:
+      condition: service_healthy
+  networks:
+    - frontend
+    - proxy-immich-public
+  labels:
+    diun.enable: true
+
 services:
   immich-server:
     image: ghcr.io/immich-app/immich-server:v3
-    restart: always
+    <<: *restart_policy
     depends_on:
       - redis
       - database
@@ -49,90 +151,22 @@ services:
       homepage.widget.hideErrors: true
 
   immich-public-proxy:
-    image: ghcr.io/alangrainger/immich-public-proxy:3
-    restart: always
-    depends_on:
-      immich-server:
-        condition: service_healthy
+    image: ghcr.io/alangrainger/immich-public-proxy:4
+    <<: *ipp-base
     healthcheck:
-      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
-      start_period: 10s
-      timeout: 5s
-    environment:
-      PUBLIC_BASE_URL: https://${IMMICH_EXTERNAL_SUBDOMAIN:?error}.${EXTERNAL_DOMAIN:?error}
-      IMMICH_URL: http://immich-server:2283
-      CONFIG: |
-        {
-          "ipp": {
-            "responseHeaders": {
-              "Cache-Control": "public, max-age=2592000",
-              "Access-Control-Allow-Origin":  "*"
-            },
-            "maxDownloadQuality": "original",
-            "maxZoomQuality": "fullsize",
-            "motionPhotos": true,
-            "downloadedFilename": 2,
-            "allowDownload": 1,
-            "allowSlugLinks": false,
-            "showHomePage": true,
-            "showMetadata": {
-              "description": {
-                "caption": true,
-                "sidebar": true
-              },
-              "exif": {
-                "dateTimeOriginal": true,
-                "timeZone": true,
-                "fileName": false,
-                "dimensions": true,
-                "fileSize": true,
-                "make": true,
-                "model": true,
-                "lensModel": true,
-                "exposureTime": true,
-                "iso": true,
-                "fNumber": true,
-                "focalLength": true
-              },
-              "location": {
-                "city": true,
-                "state": true,
-                "country": true,
-                "gps": true,
-                "webLink": true
-              }
-            },
-            "customInvalidResponse": false,
-            "gallery": {
-              "singleImage": true,
-              "singleVideo": true,
-              "singleItemAutoOpen": true,
-              "showTitle": true,
-              "showDescription": true,
-              "showExpiryDate": true,
-              "expiryDateFormat": "MMM D, YYYY [at] h:mm A",
-              "expiryDateLocale": "en-ca",
-              "groupByDate": "day",
-              "showDownloadZip": true,
-              "cacheTime": 300
-            },
-            "lightbox": {
-              "showArrows": true,
-              "showDownload": true,
-              "mobileArrows": false,
-              "autoPlayVideos": false
-            }
-          }
-        }
-    networks:
-      - frontend
-      - proxy-immich-public
-    labels:
-      diun.enable: true
+      <<: *healthcheck_defaults
+      test: curl -sf -m 4 http://localhost:3000/share/healthcheck -o /dev/null || exit 1
+
+  immich-public-proxy-upload:
+    image: ghcr.io/alangrainger/immich-public-proxy-upload:4
+    <<: *ipp-base
+    healthcheck:
+      <<: *healthcheck_defaults
+      test: curl -sf -m 4 http://localhost:3000/healthcheck -o /dev/null || exit 1
 
   immich-machine-learning:
     image: ghcr.io/immich-app/immich-machine-learning:v3
-    restart: always
+    <<: *restart_policy
     volumes:
       - model-cache:/cache
     healthcheck:
@@ -149,7 +183,7 @@ services:
 
   redis:
     image: docker.io/valkey/valkey:9@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
-    restart: always
+    <<: *restart_policy
     healthcheck:
       test: valkey-cli -a '${IMMICH_CACHE_PASSWORD:?error}' ping | grep -q PONG || exit 1
     environment:
@@ -159,7 +193,7 @@ services:
 
   database:
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
-    restart: always
+    <<: *restart_policy
     volumes:
       - db-data:/var/lib/postgresql/data
     shm_size: 128mb
