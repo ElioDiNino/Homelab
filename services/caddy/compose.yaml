@@ -244,7 +244,6 @@ services:
       HOMELAB_EXTERNAL_SUBDOMAIN: ${HOMELAB_EXTERNAL_SUBDOMAIN:?error}
       INGEST_EXTERNAL_SUBDOMAIN: ${INGEST_EXTERNAL_SUBDOMAIN:?error}
       IMMICH_EXTERNAL_SUBDOMAIN: ${IMMICH_EXTERNAL_SUBDOMAIN:?error}
-      IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN: ${IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN:?error}
       PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN: ${PINGVIN_SHARE_X_EXTERNAL_SUBDOMAIN:?error}
     labels:
       diun.enable: true
@@ -272,47 +271,14 @@ configs:
       }
 
       {$$IMMICH_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-        @external path /share/*
-        handle @external {
+        @upload path /upload/*
+        handle @upload {
+          reverse_proxy immich-public-proxy-upload:3000
+        }
+
+        @share path /share/*
+        handle @share {
           reverse_proxy immich-public-proxy:3000
-        }
-
-        handle {
-          redir https://{$$HOMELAB_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}?next=photos{uri} temporary
-        }
-      }
-
-      {$$IMMICH_UPLOAD_EXTERNAL_SUBDOMAIN}.{$$EXTERNAL_DOMAIN}:80 {
-        @external `
-          (
-            method('GET') &&
-            (
-              path('/share/*') ||
-              path('/api/server/config') ||
-              path('/api/server/features') ||
-              path('/api/server/media-types') ||
-              path('/api/shared-links/me') ||
-              path('/api/albums/*') ||
-              path('/api/assets/*') ||
-              path('/api/timeline/bucket') ||
-              path('/api/timeline/buckets') ||
-              path('/_app/*') ||
-              path('/custom.css') ||
-              path('/dark_skeleton.png') ||
-              path('/manifest.json') ||
-              path('/favicon.ico')
-            )
-          ) || (
-            method('POST') &&
-            (
-              path('/api/shared-links/login') ||
-              path('/api/download/*') ||
-              path('/api/assets')
-            )
-          )
-        `
-        handle @external {
-          reverse_proxy immich-server:2283
         }
 
         handle {
