@@ -171,6 +171,8 @@ services:
       - model-cache:/cache
     healthcheck:
       disable: false
+    environment:
+      MACHINE_LEARNING_MODEL_REVISION: v2
     networks:
       - outgoing
       - backend
@@ -206,6 +208,7 @@ services:
       POSTGRES_USER_FILE: /run/secrets/db_username
       POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       POSTGRES_INITDB_ARGS: "--data-checksums"
+      DB_STORAGE_TYPE: SSD
     networks:
       - backend
 
