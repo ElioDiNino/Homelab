@@ -26,6 +26,7 @@ x-environment-ipp: &environment-ipp
           "showHomePage": true,
           "allowSlugLinks": false,
           "uploadUrl": "/upload",
+          "shareCacheTime": 120,
           "showMetadata": {
             "description": {
               "caption": true,
@@ -78,6 +79,9 @@ x-environment-ipp: &environment-ipp
             "rateLimit": 60,
             "byteBudget": 10240,
             "filenamePrefix": "ipp_upload_",
+            "notice": "Uploaded photos may not appear in the gallery immediately.",
+            "askName": true,
+            "fieldSeparator": ",",
             "notifyUrl": "https://gotify.${INTERNAL_DOMAIN:?error}/message?token=${IMMICH_PUBLIC_PROXY_GOTIFY_TOKEN:?error}",
             "notifyHeaders": {},
             "notifyTimeout": 10000
