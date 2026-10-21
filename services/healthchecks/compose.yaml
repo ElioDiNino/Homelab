@@ -21,7 +21,7 @@ services:
   web:
     image: healthchecks/healthchecks:latest
     restart: always
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uwsgi /opt/healthchecks/docker/uwsgi.ini'
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; /opt/healthchecks/run.sh'
     depends_on:
       db:
         condition: service_healthy
