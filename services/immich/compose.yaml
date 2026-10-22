@@ -196,6 +196,8 @@ services:
       VALKEY_EXTRA_FLAGS: "--requirepass ${IMMICH_CACHE_PASSWORD:?error}"
     networks:
       - backend
+    labels:
+      diun.enable: true
 
   database:
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
@@ -215,6 +217,9 @@ services:
       DB_STORAGE_TYPE: SSD
     networks:
       - backend
+    labels:
+      diun.enable: true
+      diun.include_tags: ^\d+-vectorchord[\d.]+-pgvectors[\d.]+$
 
 secrets:
   db_name:

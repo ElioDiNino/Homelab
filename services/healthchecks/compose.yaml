@@ -17,6 +17,8 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/db-password
     networks:
       - database
+    labels:
+      diun.enable: true
 
   web:
     image: healthchecks/healthchecks:latest

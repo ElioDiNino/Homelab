@@ -16,6 +16,9 @@ services:
       POSTGRES_DB: ${AIRTRAIL_DB_DATABASE_NAME:?error}
       POSTGRES_USER: ${AIRTRAIL_DB_USERNAME:?error}
       POSTGRES_PASSWORD: ${AIRTRAIL_DB_PASSWORD:?error}
+    labels:
+      diun.enable: true
+      diun.include_tags: ^\d+-alpine$
 
   airtrail:
     image: johly/airtrail:v3
