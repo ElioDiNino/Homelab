@@ -6,6 +6,10 @@ services:
       mkdir -p /srv/stirling-pdf/configs /srv/stirling-pdf/logs /srv/stirling-pdf/customFiles /srv/stirling-pdf/pipeline /srv/stirling-pdf/trainingData
     volumes:
       - data:/srv/stirling-pdf
+    labels:
+      diun.enable: true
+      diun.watch_repo: false
+      diun.include_tags: ^latest$
 
   stirling-pdf:
     image: ghcr.io/stirling-tools/stirling-pdf:latest

@@ -13,6 +13,9 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/db-password
     networks:
       - database
+    labels:
+      diun.enable: true
+      diun.include_tags: ^\d+-alpine$
 
   plausible_events_db:
     image: clickhouse/clickhouse-server:24.12-alpine
@@ -44,6 +47,9 @@ services:
       CLICKHOUSE_SKIP_USER_SETUP: 1
     networks:
       - database
+    labels:
+      diun.enable: true
+      diun.include_tags: ^\d+\.\d+-alpine$
 
   plausible:
     image: ghcr.io/plausible/community-edition:v3

@@ -48,6 +48,9 @@ services:
       timeout: 5s
     networks:
       - database
+    labels:
+      diun.enable: true
+      diun.include_tags: ^4\.4\.\d+$
 
   web:
     image: ghcr.io/yooooomi/your_spotify_client:latest
