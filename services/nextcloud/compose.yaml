@@ -103,6 +103,7 @@ services:
       - database:/var/lib/postgresql/data:rw
       - database_dump:/mnt/data:rw
     tmpfs:
+      - /var/lib/postgresql
       - /var/run/postgresql
     expose:
       - "5432"
