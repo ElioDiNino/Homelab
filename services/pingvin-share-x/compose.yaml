@@ -75,6 +75,7 @@ configs:
         allowRegistration: "true"
         ignoreTotp: "true"
         disablePassword: "true"
+        allowedHosts: "share.${INTERNAL_DOMAIN:?error}"
         github-enabled: "false"
         google-enabled: "false"
         microsoft-enabled: "false"
