@@ -168,7 +168,7 @@ services:
       MAIL_DOMAIN: ${MAIL_DOMAIN:?error}
       UPDATE_NEXTCLOUD_APPS: "yes"
       REMOVE_DISABLED_APPS: "yes"
-      STARTUP_APPS: "contacts encryption end_to_end_encryption files_retention groupfolders quota_warning suspicious_login twofactor_nextcloud_notification twofactor_totp twofactor_webauthn user_oidc -dashboard -nextcloud_announcements -photos -privacy -recommendations -support -survey_client -user_status -webhook_listeners -weather_status"
+      STARTUP_APPS: "contacts encryption end_to_end_encryption files_retention groupfolders quota_warning suspicious_login twofactor_nextcloud_notification twofactor_totp twofactor_webauthn user_oidc -circles -dashboard -nextcloud_announcements -photos -privacy -recommendations -support -survey_client -user_status -webhook_listeners -weather_status"
       ADDITIONAL_APKS: imagemagick
       ADDITIONAL_PHP_EXTENSIONS: imagick
 
