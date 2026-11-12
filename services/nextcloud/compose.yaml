@@ -208,6 +208,8 @@ services:
     user: "33"
     volumes:
       - nextcloud:/var/www/html:ro
+    tmpfs:
+      - /tmp
     expose:
       - "7867"
     healthcheck:
@@ -292,7 +294,7 @@ services:
 
   fulltextsearch:
     image: ghcr.io/nextcloud-releases/aio-fulltextsearch:latest
-    <<: [*restart_policy, *cap_drop]
+    <<: [*restart_policy, *cap_drop, *init]
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
     expose:
