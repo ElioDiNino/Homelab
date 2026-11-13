@@ -19,6 +19,7 @@ services:
       - database
     labels:
       diun.enable: true
+      diun.watch_repo: false
 
   web:
     image: healthchecks/healthchecks:latest
