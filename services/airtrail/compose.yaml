@@ -18,7 +18,7 @@ services:
       POSTGRES_PASSWORD: ${AIRTRAIL_DB_PASSWORD:?error}
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^\d+-alpine$
 
   airtrail:

@@ -8,7 +8,7 @@ services:
       - data:/srv/stirling-pdf
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
 
   stirling-pdf:
@@ -63,7 +63,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
       sablier.enable: true
       sablier.group: stirling-pdf

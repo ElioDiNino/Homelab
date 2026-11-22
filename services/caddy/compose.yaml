@@ -43,7 +43,7 @@ services:
       SENTRY_CSP_ENDPOINT: ${SENTRY_CSP_ENDPOINT:?error}
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
       socket-proxy.allow.get: (/v1\.\d{1,2})?/(info|containers/json(\?\S+)?|events(\?\S+)?|networks(/\w+)?)
       socket-proxy.allow.head: (/v1\.\d{1,2})?/_ping
@@ -96,7 +96,7 @@ services:
       SABLIER_STRATEGY_DYNAMIC_DEFAULT_REFRESH_FREQUENCY: 5s
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
       socket-proxy.allow.get: (/v1\.\d{1,2})?/(version|containers/(json|[\w.-]+/json)(\?\S+)?|events(\?\S+)?)
       socket-proxy.allow.post: (/v1\.\d{1,2})?/containers/[\w.-]+/(start|stop|wait|pause|unpause)(\?\S+)?
@@ -109,7 +109,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
 
       #### Global Settings ####

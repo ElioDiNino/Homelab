@@ -39,7 +39,7 @@ x-environment-postgres: &environment_postgres
   POSTGRES_PASSWORD: ${NEXTCLOUD_DATABASE_PASSWORD:?error}
 x-labels-diun: &labels-diun
   diun.enable: true
-  diun.watch_repo: false
+  diun.watch_mode: tag
   diun.include_tags: ^latest$
 
 services:
