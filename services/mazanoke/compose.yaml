@@ -11,7 +11,7 @@ services:
       - proxy-internal
     labels:
       diun.enable: true
-      diun.watch_repo: false
+      diun.watch_mode: tag
       diun.include_tags: ^latest$
       caddy: "{$$WILDCARD_INTERNAL}"
       caddy.import: service_proxy optimize
