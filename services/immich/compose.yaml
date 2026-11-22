@@ -75,7 +75,8 @@ x-environment-ipp: &environment-ipp
             "options": {}
           },
           "upload": {
-            "maxFileSize": 100,
+            "maxFileSize": 2048,
+            "chunkSize": 10,
             "rateLimit": 60,
             "byteBudget": 10240,
             "filenamePrefix": "ipp_upload_",
